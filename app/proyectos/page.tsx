@@ -117,29 +117,33 @@ export default function ProyectosPage() {
     <div className="mx-auto max-w-2xl px-4 py-6">
       {/* Modal overlay for form */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-4 overflow-y-auto">
-          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-ae-surface rounded-2xl p-6 border border-ae-border shadow-xl my-auto">
-            <h2 className="text-lg font-bold text-ae-text mb-4">Nuevo proyecto</h2>
-            <ProjectForm onSave={handleCreateProject} onCancel={() => setShowForm(false)} />
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 p-4" onClick={() => setShowForm(false)}>
+          <div className="flex min-h-full items-start justify-center pt-8 pb-4">
+            <div className="w-full max-w-md bg-ae-surface rounded-2xl p-6 border border-ae-border shadow-xl " onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-lg font-bold text-ae-text mb-4">Nuevo proyecto</h2>
+              <ProjectForm onSave={handleCreateProject} onCancel={() => setShowForm(false)} />
+            </div>
           </div>
         </div>
       )}
 
       {/* Modal overlay for detail */}
       {selectedProject && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 py-8 overflow-y-auto">
-          <div className="w-full max-w-lg bg-ae-surface rounded-2xl p-6 border border-ae-border shadow-xl">
-            <ProjectDetail
-              project={selectedProject}
-              tasks={getProjectTasks(selectedProject)}
-              onClose={() => setSelectedProject(null)}
-              onAddTask={handleAddTask}
-              onToggleTask={handleToggleTask}
-              onUpdateProject={handleUpdateProject}
-              onArchive={handleArchive}
-              onComplete={handleComplete}
-              onReopen={handleReopen}
-            />
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 p-4" onClick={() => setSelectedProject(null)}>
+          <div className="flex min-h-full items-start justify-center pt-8 pb-4">
+            <div className="w-full max-w-lg bg-ae-surface rounded-2xl p-6 border border-ae-border shadow-xl " onClick={(e) => e.stopPropagation()}>
+              <ProjectDetail
+                project={selectedProject}
+                tasks={getProjectTasks(selectedProject)}
+                onClose={() => setSelectedProject(null)}
+                onAddTask={handleAddTask}
+                onToggleTask={handleToggleTask}
+                onUpdateProject={handleUpdateProject}
+                onArchive={handleArchive}
+                onComplete={handleComplete}
+                onReopen={handleReopen}
+              />
+            </div>
           </div>
         </div>
       )}

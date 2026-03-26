@@ -149,10 +149,12 @@ export default function HabitosPage() {
 
       {/* HabitForm modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center overflow-y-auto sm:py-4">
-          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-2xl bg-ae-bg p-5 sm:rounded-2xl sm:p-6 sm:my-auto">
-            <h2 className="mb-5 text-lg font-bold text-ae-text">Nuevo hábito</h2>
-            <HabitForm onSave={handleAddHabit} onCancel={() => setShowForm(false)} />
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 p-4" onClick={() => setShowForm(false)}>
+          <div className="flex min-h-full items-start justify-center pt-8 pb-4">
+            <div className="w-full max-w-lg rounded-2xl bg-ae-bg p-5 sm:p-6 " onClick={(e) => e.stopPropagation()}>
+              <h2 className="mb-5 text-lg font-bold text-ae-text">Nuevo hábito</h2>
+              <HabitForm onSave={handleAddHabit} onCancel={() => setShowForm(false)} />
+            </div>
           </div>
         </div>
       )}
