@@ -53,21 +53,30 @@ export default function ProyectosPage() {
   }
 
   const handleCreateProject = async (data: Partial<Project> & { title: string }) => {
-    await addProject(data)
-    setShowForm(false)
+    try {
+      await addProject(data)
+      setShowForm(false)
+    } catch (err) {
+      console.error('Error creating project:', err)
+    }
   }
 
-  const handleAddTask = async (title: string) => {
+  const handleAddTask = async (title: string, priority: 'primordial' | 'importante' | 'puede_esperar', dayId?: string) => {
     if (!selectedProject) return
-    const task = await addTask({
-      title,
-      priority: 'puede_esperar',
-      parentProjectId: selectedProject.id,
-    })
-    await addTaskToProject(selectedProject.id, task.id)
-    setSelectedProject((prev) =>
-      prev ? { ...prev, taskIds: [...prev.taskIds, task.id] } : prev
-    )
+    try {
+      const task = await addTask({
+        title,
+        priority,
+        dayId: dayId || undefined,
+        parentProjectId: selectedProject.id,
+      })
+      await addTaskToProject(selectedProject.id, task.id)
+      setSelectedProject((prev) =>
+        prev ? { ...prev, taskIds: [...prev.taskIds, task.id] } : prev
+      )
+    } catch (err) {
+      console.error('Error adding task:', err)
+    }
   }
 
   const handleToggleTask = async (taskId: string) => {
@@ -108,8 +117,8 @@ export default function ProyectosPage() {
     <div className="mx-auto max-w-2xl px-4 py-6">
       {/* Modal overlay for form */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-md bg-ae-surface rounded-2xl p-6 border border-ae-border shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-4 overflow-y-auto">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-ae-surface rounded-2xl p-6 border border-ae-border shadow-xl my-auto">
             <h2 className="text-lg font-bold text-ae-text mb-4">Nuevo proyecto</h2>
             <ProjectForm onSave={handleCreateProject} onCancel={() => setShowForm(false)} />
           </div>

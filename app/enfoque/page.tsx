@@ -122,8 +122,8 @@ export default function EnfoquePage() {
         ) : (
           <h1 className="text-sm font-medium text-ae-text-muted">🎯 Enfoque</h1>
         )}
-        <span className="text-sm text-ae-text-muted">
-          🍅 {timer.sessionsCompleted} sesiones hoy
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-ae-surface-2 px-3 py-1 text-sm font-medium text-amber-400">
+          <span className="text-base">🍅</span> {timer.sessionsCompleted}
         </span>
       </div>
 
@@ -173,15 +173,16 @@ export default function EnfoquePage() {
           totalSeconds={timer.totalSeconds}
           status={timer.status}
           mode={timer.mode}
+          isBreak={timer.isBreak}
           onTick={tickTimer}
         />
       </div>
 
       {/* Break transition overlay */}
       {timer.status === 'completed' && !timer.isBreak && timer.breakMode && (
-        <div className="mb-6 rounded-xl border border-green-700 bg-green-950/60 p-4 text-center">
-          <p className="text-lg font-semibold text-green-300">
-            ¡Sesión completada! 🎉 Iniciando descanso...
+        <div className="mb-6 animate-fade-in rounded-xl border border-green-700 bg-green-950/60 p-4 text-center backdrop-blur-sm">
+          <p className="text-lg font-semibold text-green-300 animate-pulse">
+            ¡Sesión completada! Iniciando descanso...
           </p>
         </div>
       )}
@@ -231,7 +232,16 @@ export default function EnfoquePage() {
 
           {/* "Ready for another session?" prompt after break ends */}
           {timer.status === 'idle' && timer.sessionsCompleted > 0 && !timer.isBreak && (
-            <p className="text-sm text-ae-text-muted">¿Listo para otra sesión?</p>
+            <div className="flex flex-col items-center gap-2 animate-fade-in">
+              <p className="text-sm text-ae-text-muted">¿Listo para otra sesión?</p>
+              <button
+                onClick={handleStart}
+                disabled={!selectedTaskId}
+                className="rounded-xl bg-amber-500 px-8 py-3 text-base font-semibold text-black transition-colors hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40 animate-bounce-subtle"
+              >
+                Empezar otra sesión
+              </button>
+            </div>
           )}
 
           {/* Start / Pause / Resume — hide during break auto-transition */}

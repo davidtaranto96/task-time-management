@@ -13,7 +13,7 @@ interface InboxStoreState {
   updateNote: (id: string, updates: Partial<QuickNote>) => Promise<void>
   processNote: (
     id: string,
-    processedTo: { type: 'task' | 'project' | 'event'; targetId: string }
+    processedTo: { type: 'task' | 'project' | 'event' | 'note'; targetId: string }
   ) => Promise<void>
   deleteNote: (id: string) => Promise<void>
 

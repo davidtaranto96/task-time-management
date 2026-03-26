@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation'
 
 const NAV_ITEMS = [
   { href: '/hoy', label: 'Hoy', icon: '☀️' },
-  { href: '/inbox', label: 'Inbox', icon: '📥' },
   { href: '/semana', label: 'Semana', icon: '📅' },
+  { href: '/inbox', label: 'Inbox', icon: '📥' },
   { href: '/enfoque', label: 'Enfoque', icon: '🎯' },
   { href: '/mas', label: 'Más', icon: '⋯' },
 ]

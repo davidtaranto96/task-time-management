@@ -176,12 +176,16 @@ export default function DashboardPage() {
         <div className="bg-ae-surface rounded-xl p-4">
           <h2 className="text-ae-text font-semibold mb-3">Metas semanales</h2>
           <div className="space-y-2">
-            {currentWeek.primordialGoals.map((goal, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="text-ae-text-muted mt-0.5">○</span>
-                <span className="text-ae-text text-sm">{goal}</span>
-              </div>
-            ))}
+            {currentWeek.primordialGoals.map((goal, i) => {
+              const text = typeof goal === 'string' ? goal : goal.text
+              const done = typeof goal === 'string' ? false : goal.done
+              return (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="text-ae-text-muted mt-0.5">{done ? '●' : '○'}</span>
+                  <span className={`text-sm ${done ? 'line-through text-ae-text-muted' : 'text-ae-text'}`}>{text}</span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

@@ -4,23 +4,24 @@ import type { QuickNote, QuickNoteType } from "@/types"
 
 interface NoteItemProps {
   note: QuickNote
-  onProcess: (noteId: string) => void
+  onProcess?: (noteId: string) => void
   onDelete: (noteId: string) => void
+  showProcess?: boolean
 }
 
 const TYPE_ICONS: Record<QuickNoteType, string> = {
   idea: "💡",
-  task: "✅",
-  reminder: "🔔",
-  contact: "👤",
-  general: "📝",
+  nota: "📝",
+  tarea: "✅",
+  proyecto: "🚀",
+  general: "📋",
 }
 
 const TYPE_LABELS: Record<QuickNoteType, string> = {
   idea: "Idea",
-  task: "Tarea",
-  reminder: "Recordatorio",
-  contact: "Contacto",
+  nota: "Nota",
+  tarea: "Tarea",
+  proyecto: "Proyecto",
   general: "General",
 }
 
@@ -41,7 +42,7 @@ function formatRelativeTime(isoString: string): string {
   return then.toLocaleDateString("es-ES", { day: "numeric", month: "short" })
 }
 
-export function NoteItem({ note, onProcess, onDelete }: NoteItemProps) {
+export function NoteItem({ note, onProcess, onDelete, showProcess = true }: NoteItemProps) {
   return (
     <div className="rounded-lg bg-ae-surface border-l-2 border-ae-info px-4 py-3 flex flex-col gap-2">
       <p className="text-ae-text text-sm leading-relaxed whitespace-pre-wrap break-words">
@@ -57,12 +58,14 @@ export function NoteItem({ note, onProcess, onDelete }: NoteItemProps) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => onProcess(note.id)}
-            className="text-xs font-medium text-ae-primordial hover:opacity-80 transition-opacity"
-          >
-            Procesar →
-          </button>
+          {showProcess && onProcess && (
+            <button
+              onClick={() => onProcess(note.id)}
+              className="text-xs font-medium text-ae-primordial hover:opacity-80 transition-opacity"
+            >
+              Procesar →
+            </button>
+          )}
           <button
             onClick={() => onDelete(note.id)}
             className="text-xs text-ae-text-muted hover:text-ae-danger transition-colors leading-none"

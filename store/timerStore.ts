@@ -35,6 +35,7 @@ const initialTimer: TimerState = {
   startedAt: null,
   isBreak: false,
   breakMode: null,
+  workMode: 'pomodoro_50',
 }
 
 export const useTimerStore = create<TimerStoreState>()((set, get) => ({
@@ -46,6 +47,7 @@ export const useTimerStore = create<TimerStoreState>()((set, get) => ({
       timer: {
         ...get().timer,
         mode,
+        workMode: mode,
         status: 'running' as TimerStatus,
         activeTaskId: taskId,
         remainingSeconds: duration,
@@ -69,15 +71,8 @@ export const useTimerStore = create<TimerStoreState>()((set, get) => ({
 
   stopTimer: () => {
     set((s) => {
-      // If we're in a break, restore the original work mode
-      const baseMode = s.timer.isBreak
-        ? (s.timer.breakMode ?? s.timer.mode) // breakMode holds the break; we want the original — stored in startedAt context; fall back to mode
-        : s.timer.mode
-      // Safest: just use the mode before the break started. Since we always
-      // overwrite `mode` when starting a break, restore from breakMode's pair
-      // We don't store original work mode, so reset to current mode if not break,
-      // or pomodoro_50 default if break is active.
-      const resetMode: TimerMode = s.timer.isBreak ? 'pomodoro_50' : s.timer.mode
+      // Always restore to the original work mode (preserved across breaks)
+      const resetMode: TimerMode = s.timer.workMode
       return {
         timer: {
           ...s.timer,
@@ -110,12 +105,16 @@ export const useTimerStore = create<TimerStoreState>()((set, get) => ({
     const { timer } = get()
 
     if (timer.isBreak) {
-      // Break finished — return to idle
+      // Break finished — restore original work mode and return to idle
+      const restoreMode = timer.workMode
+      const restoreDuration = TIMER_DURATIONS[restoreMode]
       set((s) => ({
         timer: {
           ...s.timer,
+          mode: restoreMode,
           status: 'idle' as TimerStatus,
-          remainingSeconds: 0,
+          remainingSeconds: restoreDuration,
+          totalSeconds: restoreDuration,
           isBreak: false,
           breakMode: null,
         },
@@ -159,6 +158,7 @@ export const useTimerStore = create<TimerStoreState>()((set, get) => ({
       timer: {
         ...s.timer,
         mode,
+        workMode: mode,
         remainingSeconds: duration,
         totalSeconds: duration,
         status: 'idle' as TimerStatus,

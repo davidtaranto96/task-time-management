@@ -41,7 +41,7 @@ interface WeeklyStoreState {
 
   loadWeek: (weekId?: string) => Promise<void>
   createWeekPlan: (weekId: string) => Promise<WeeklyPlan>
-  updateGoals: (goals: string[]) => Promise<void>
+  updateGoals: (goals: Array<{text: string, done: boolean}>) => Promise<void>
   setProjectFocus: (projectIds: string[]) => Promise<void>
   setReflection: (text: string) => Promise<void>
   completeWeek: () => Promise<void>
@@ -97,7 +97,7 @@ export const useWeeklyStore = create<WeeklyStoreState>()(
         return plan
       },
 
-      updateGoals: async (goals: string[]) => {
+      updateGoals: async (goals: Array<{text: string, done: boolean}>) => {
         const state = getState()
         if (!state.currentWeek) return
         const updated: WeeklyPlan = { ...state.currentWeek, primordialGoals: goals }

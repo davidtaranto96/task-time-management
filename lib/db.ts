@@ -192,6 +192,10 @@ export async function getJournalEntries(dayIds: string[]): Promise<JournalEntry[
   return entries.filter(Boolean) as JournalEntry[]
 }
 
+export async function deleteJournalEntry(dayId: string): Promise<void> {
+  await del(`ae:journal:${dayId}`)
+}
+
 export async function getAllJournalEntries(): Promise<JournalEntry[]> {
   const allKeys = await keys()
   const journalKeys = allKeys.filter((k) => String(k).startsWith('ae:journal:'))

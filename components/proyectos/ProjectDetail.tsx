@@ -28,7 +28,7 @@ interface ProjectDetailProps {
   project: Project
   tasks: Task[]
   onClose: () => void
-  onAddTask: (title: string) => void
+  onAddTask: (title: string, priority: 'primordial' | 'importante' | 'puede_esperar', dayId?: string) => void
   onToggleTask: (taskId: string) => void
   onUpdateProject: (updates: Partial<Project>) => void
   onArchive: () => void
@@ -48,6 +48,8 @@ export default function ProjectDetail({
   onReopen,
 }: ProjectDetailProps) {
   const [newTaskTitle, setNewTaskTitle] = useState('')
+  const [newTaskPriority, setNewTaskPriority] = useState<'primordial' | 'importante' | 'puede_esperar'>('puede_esperar')
+  const [newTaskDayId, setNewTaskDayId] = useState('')
   const [notes, setNotes] = useState(project.notes ?? '')
   const [editingDesc, setEditingDesc] = useState(false)
   const [descValue, setDescValue] = useState(project.description ?? '')
@@ -64,8 +66,10 @@ export default function ProjectDetail({
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault()
     if (!newTaskTitle.trim()) return
-    onAddTask(newTaskTitle.trim())
+    onAddTask(newTaskTitle.trim(), newTaskPriority, newTaskDayId || undefined)
     setNewTaskTitle('')
+    setNewTaskPriority('puede_esperar')
+    setNewTaskDayId('')
     addTaskRef.current?.focus()
   }
 
@@ -177,6 +181,11 @@ export default function ProjectDetail({
                   className="w-4 h-4 rounded border border-ae-border flex items-center justify-center shrink-0 hover:border-ae-success transition-colors"
                 />
                 <span className="flex-1 text-sm text-ae-text">{task.title}</span>
+                {task.dayId && (
+                  <span className="text-xs px-1.5 py-0.5 rounded-full shrink-0 bg-ae-surface-2 text-ae-text-muted">
+                    {task.dayId}
+                  </span>
+                )}
                 <span
                   className="text-xs px-1.5 py-0.5 rounded-full shrink-0"
                   style={{ backgroundColor: prio.color + '22', color: prio.color }}
@@ -212,22 +221,52 @@ export default function ProjectDetail({
         )}
 
         {/* Add task input */}
-        <form onSubmit={handleAddTask} className="mt-3 flex gap-2">
-          <input
-            ref={addTaskRef}
-            type="text"
-            value={newTaskTitle}
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            placeholder="+ Agregar tarea..."
-            className="flex-1 bg-ae-surface-2 border border-ae-border rounded-lg px-3 py-1.5 text-sm text-ae-text placeholder-ae-text-muted focus:outline-none focus:border-ae-primordial"
-          />
-          <button
-            type="submit"
-            disabled={!newTaskTitle.trim()}
-            className="px-3 py-1.5 bg-ae-primordial text-ae-bg text-sm font-semibold rounded-lg disabled:opacity-40 hover:opacity-90 transition-opacity"
-          >
-            +
-          </button>
+        <form onSubmit={handleAddTask} className="mt-3 space-y-2">
+          <div className="flex gap-2">
+            <input
+              ref={addTaskRef}
+              type="text"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              placeholder="+ Agregar tarea..."
+              className="flex-1 bg-ae-surface-2 border border-ae-border rounded-lg px-3 py-1.5 text-sm text-ae-text placeholder-ae-text-muted focus:outline-none focus:border-ae-primordial"
+            />
+            <button
+              type="submit"
+              disabled={!newTaskTitle.trim()}
+              className="px-3 py-1.5 bg-ae-primordial text-ae-bg text-sm font-semibold rounded-lg disabled:opacity-40 hover:opacity-90 transition-opacity"
+            >
+              +
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {(['primordial', 'importante', 'puede_esperar'] as const).map((p) => {
+              const info = PRIORITY_LABELS[p]
+              const isSelected = newTaskPriority === p
+              return (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setNewTaskPriority(p)}
+                  className="text-xs px-2 py-0.5 rounded-full font-medium border transition-all"
+                  style={{
+                    backgroundColor: isSelected ? info.color + '33' : 'transparent',
+                    borderColor: isSelected ? info.color : '#2a2a35',
+                    color: isSelected ? info.color : '#71717a',
+                  }}
+                >
+                  {info.label}
+                </button>
+              )
+            })}
+            <input
+              type="date"
+              lang="es"
+              value={newTaskDayId}
+              onChange={(e) => setNewTaskDayId(e.target.value)}
+              className="bg-ae-surface-2 border border-ae-border rounded-lg px-2 py-0.5 text-xs text-ae-text focus:outline-none focus:border-ae-primordial"
+            />
+          </div>
         </form>
       </div>
 

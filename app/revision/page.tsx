@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
 import { useTaskStore } from '@/store/taskStore'
 import { useJournalStore } from '@/store/journalStore'
+import { Toast } from '@/components/shared/Toast'
 import type { MoodLevel, JournalEntry } from '@/types/journal'
 
 const MOODS: { emoji: string; label: string; value: MoodLevel }[] = [
@@ -31,8 +31,17 @@ function formatDate(dayId: string): string {
   })
 }
 
-function EntryCard({ entry }: { entry: JournalEntry }) {
+function EntryCard({
+  entry,
+  onDelete,
+  onEdit,
+}: {
+  entry: JournalEntry
+  onDelete: (dayId: string) => void
+  onEdit: (entry: JournalEntry) => void
+}) {
   const [expanded, setExpanded] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const moodInfo = entry.mood ? MOODS.find((m) => m.value === entry.mood) : null
 
   return (
@@ -41,11 +50,44 @@ function EntryCard({ entry }: { entry: JournalEntry }) {
         <p className="text-ae-text font-medium capitalize text-sm">
           {formatDate(entry.dayId)}
         </p>
-        {moodInfo && (
-          <span className="text-xl shrink-0" title={moodInfo.label}>
-            {moodInfo.emoji}
-          </span>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          {moodInfo && (
+            <span className="text-xl" title={moodInfo.label}>
+              {moodInfo.emoji}
+            </span>
+          )}
+          <button
+            onClick={() => onEdit(entry)}
+            className="text-ae-text-muted hover:text-ae-primordial transition-colors p-1"
+            title="Editar"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          {confirmDelete ? (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => onDelete(entry.dayId)}
+                className="text-xs bg-ae-danger text-white px-2 py-1 rounded-lg"
+              >
+                Sí
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="text-xs bg-ae-surface-2 text-ae-text-muted px-2 py-1 rounded-lg border border-ae-border"
+              >
+                No
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="text-ae-text-muted hover:text-ae-danger transition-colors p-1"
+              title="Borrar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {entry.gratitude && (
@@ -90,17 +132,34 @@ function EntryCard({ entry }: { entry: JournalEntry }) {
   )
 }
 
-function HistorialTab() {
-  const { getAllEntries } = useJournalStore()
+function HistorialTab({
+  onEdit,
+  onDelete,
+}: {
+  onEdit: (entry: JournalEntry) => void
+  onDelete: (dayId: string) => void
+}) {
+  const { getAllEntries, deleteEntry } = useJournalStore()
   const [entries, setEntries] = useState<JournalEntry[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const reload = useCallback(() => {
+    setLoading(true)
     getAllEntries().then((all) => {
       setEntries(all)
       setLoading(false)
     })
-  }, [])
+  }, [getAllEntries])
+
+  useEffect(() => {
+    reload()
+  }, [reload])
+
+  const handleDelete = async (dayId: string) => {
+    await deleteEntry(dayId)
+    setEntries((prev) => prev.filter((e) => e.dayId !== dayId))
+    onDelete(dayId)
+  }
 
   if (loading) {
     return <p className="text-ae-text-muted text-sm mt-6 text-center">Cargando...</p>
@@ -119,14 +178,18 @@ function HistorialTab() {
   return (
     <div className="space-y-3 mt-4">
       {entries.map((entry) => (
-        <EntryCard key={entry.dayId} entry={entry} />
+        <EntryCard
+          key={entry.dayId}
+          entry={entry}
+          onDelete={handleDelete}
+          onEdit={onEdit}
+        />
       ))}
     </div>
   )
 }
 
 export default function RevisionPage() {
-  const router = useRouter()
   const [activeTab, setActiveTab] = useState<'hoy' | 'historial'>('hoy')
   const [step, setStep] = useState(1)
   const totalSteps = 4
@@ -139,6 +202,9 @@ export default function RevisionPage() {
   const [gratitude, setGratitude] = useState('')
   const [learned, setLearned] = useState('')
   const [tomorrowFocus, setTomorrowFocus] = useState('')
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [step3Warning, setStep3Warning] = useState(false)
+  const [editingDayId, setEditingDayId] = useState<string | null>(null)
 
   useEffect(() => {
     loadToday()
@@ -146,7 +212,7 @@ export default function RevisionPage() {
   }, [])
 
   useEffect(() => {
-    if (todayEntry) {
+    if (todayEntry && !editingDayId) {
       if (todayEntry.mood) setMood(todayEntry.mood)
       if (todayEntry.gratitude) setGratitude(todayEntry.gratitude)
       if (todayEntry.lessonsLearned) setLearned(todayEntry.lessonsLearned)
@@ -158,6 +224,8 @@ export default function RevisionPage() {
   const completedTasks = allTasks.filter(t => t.status === 'done')
   const pendingTasks = allTasks.filter(t => t.status !== 'done' && t.status !== 'deleted' && t.status !== 'deferred')
 
+  const isStep3Empty = mood === undefined && !gratitude.trim() && !learned.trim() && !tomorrowFocus.trim()
+
   const handleSaveReflection = async () => {
     await saveEntry({ mood, gratitude, lessonsLearned: learned, tomorrowFocus })
   }
@@ -167,8 +235,56 @@ export default function RevisionPage() {
     if (date) await deferTask(id, date)
   }
 
+  const handleStep3Next = async () => {
+    if (isStep3Empty) {
+      setStep3Warning(true)
+      return
+    }
+    setStep3Warning(false)
+    await handleSaveReflection()
+    setStep(4)
+  }
+
+  const handleFinish = async () => {
+    await handleSaveReflection()
+    setEditingDayId(null)
+    setToastMessage('Revisión guardada')
+    setActiveTab('historial')
+  }
+
+  const handleDeleteEntry = (dayId: string) => {
+    if (editingDayId === dayId) {
+      setEditingDayId(null)
+    }
+    setMood(undefined)
+    setGratitude('')
+    setLearned('')
+    setTomorrowFocus('')
+    setStep(1)
+    setStep3Warning(false)
+    if (dayId === todayId) {
+      loadEntry()
+    }
+  }
+
+  const handleEditEntry = (entry: JournalEntry) => {
+    setEditingDayId(entry.dayId)
+    setMood(entry.mood)
+    setGratitude(entry.gratitude ?? '')
+    setLearned(entry.lessonsLearned ?? '')
+    setTomorrowFocus(entry.tomorrowFocus ?? '')
+    // Load the entry into todayEntry so saveEntry updates the right record
+    loadEntry(entry.dayId)
+    setStep(3)
+    setActiveTab('hoy')
+  }
+
   return (
     <div className="mx-auto max-w-lg px-4 py-6">
+      {toastMessage && (
+        <Toast message={toastMessage} onDone={() => setToastMessage(null)} />
+      )}
+
       {/* Tab switcher */}
       <div className="flex gap-1 mb-6 bg-ae-surface rounded-xl p-1 border border-ae-border">
         <button
@@ -194,7 +310,7 @@ export default function RevisionPage() {
       </div>
 
       {/* Historial tab */}
-      {activeTab === 'historial' && <HistorialTab />}
+      {activeTab === 'historial' && <HistorialTab onEdit={handleEditEntry} onDelete={handleDeleteEntry} />}
 
       {/* Hoy tab — existing wizard */}
       {activeTab === 'hoy' && (
@@ -312,7 +428,7 @@ export default function RevisionPage() {
                   {MOODS.map(m => (
                     <button
                       key={m.value}
-                      onClick={() => setMood(m.value)}
+                      onClick={() => { setMood(m.value); setStep3Warning(false) }}
                       className={`text-2xl p-2 rounded-xl transition-all ${
                         mood === m.value ? 'bg-ae-surface-2 ring-2 ring-ae-primordial scale-110' : 'bg-ae-surface'
                       }`}
@@ -329,7 +445,7 @@ export default function RevisionPage() {
                 </label>
                 <textarea
                   value={gratitude}
-                  onChange={e => setGratitude(e.target.value)}
+                  onChange={e => { setGratitude(e.target.value); setStep3Warning(false) }}
                   onBlur={handleSaveReflection}
                   rows={3}
                   className="w-full bg-ae-surface border border-ae-border rounded-xl px-3 py-2 text-ae-text placeholder:text-ae-text-muted resize-none"
@@ -343,7 +459,7 @@ export default function RevisionPage() {
                 </label>
                 <textarea
                   value={learned}
-                  onChange={e => setLearned(e.target.value)}
+                  onChange={e => { setLearned(e.target.value); setStep3Warning(false) }}
                   onBlur={handleSaveReflection}
                   rows={3}
                   className="w-full bg-ae-surface border border-ae-border rounded-xl px-3 py-2 text-ae-text placeholder:text-ae-text-muted resize-none"
@@ -357,7 +473,7 @@ export default function RevisionPage() {
                 </label>
                 <textarea
                   value={tomorrowFocus}
-                  onChange={e => setTomorrowFocus(e.target.value)}
+                  onChange={e => { setTomorrowFocus(e.target.value); setStep3Warning(false) }}
                   onBlur={handleSaveReflection}
                   rows={3}
                   className="w-full bg-ae-surface border border-ae-border rounded-xl px-3 py-2 text-ae-text placeholder:text-ae-text-muted resize-none"
@@ -365,12 +481,20 @@ export default function RevisionPage() {
                 />
               </div>
 
+              {step3Warning && (
+                <p className="text-ae-text-muted text-xs text-center mb-3">
+                  Completá al menos un campo para continuar
+                </p>
+              )}
+
               <button
-                onClick={async () => {
-                  await handleSaveReflection()
-                  setStep(4)
-                }}
-                className="w-full bg-ae-primordial text-ae-bg font-semibold rounded-xl py-3"
+                onClick={handleStep3Next}
+                disabled={isStep3Empty}
+                className={`w-full font-semibold rounded-xl py-3 transition-colors ${
+                  isStep3Empty
+                    ? 'bg-ae-border text-ae-text-muted cursor-not-allowed'
+                    : 'bg-ae-primordial text-ae-bg'
+                }`}
               >
                 Siguiente →
               </button>
@@ -413,7 +537,7 @@ export default function RevisionPage() {
               </div>
 
               <button
-                onClick={() => router.push('/hoy')}
+                onClick={handleFinish}
                 className="w-full bg-ae-success text-white font-semibold rounded-xl py-3"
               >
                 Listo, buen día ✨

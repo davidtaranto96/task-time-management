@@ -11,6 +11,7 @@ export interface TimerState {
   startedAt: string | null
   isBreak: boolean
   breakMode: TimerMode | null
+  workMode: TimerMode
 }
 
 export const TIMER_DURATIONS: Record<TimerMode, number> = {

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { saveJournalEntry, getJournalEntry, getAllJournalEntries } from '@/lib/db'
+import { saveJournalEntry, getJournalEntry, getAllJournalEntries, deleteJournalEntry } from '@/lib/db'
 import { createIDBStorage } from '@/lib/persistence'
 import type { JournalEntry } from '@/types'
 
@@ -16,6 +16,7 @@ interface JournalStoreState {
   saveEntry: (updates: Partial<JournalEntry>) => Promise<void>
   getEntry: (dayId: string) => Promise<JournalEntry | null>
   getAllEntries: () => Promise<JournalEntry[]>
+  deleteEntry: (dayId: string) => Promise<void>
 }
 
 export const useJournalStore = create<JournalStoreState>()(
@@ -63,6 +64,14 @@ export const useJournalStore = create<JournalStoreState>()(
       getAllEntries: async () => {
         const entries = await getAllJournalEntries()
         return entries.sort((a, b) => b.dayId.localeCompare(a.dayId))
+      },
+
+      deleteEntry: async (dayId: string) => {
+        await deleteJournalEntry(dayId)
+        const state = getState()
+        if (state.todayEntry?.dayId === dayId) {
+          setState({ todayEntry: null })
+        }
       },
     }),
     {

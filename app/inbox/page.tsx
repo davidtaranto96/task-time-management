@@ -8,7 +8,7 @@ import { CaptureInput } from "@/components/inbox/CaptureInput"
 import { NoteItem } from "@/components/inbox/NoteItem"
 import { ProcessSheet } from "@/components/inbox/ProcessSheet"
 import { getTodayId } from "@/lib/dateUtils"
-import type { QuickNote } from "@/types"
+import type { QuickNote, QuickNoteType } from "@/types"
 import type { TaskPriority } from "@/types"
 import type { AreaKey } from "@/types/area"
 
@@ -25,15 +25,17 @@ export default function InboxPage() {
     loadNotes()
   }, [loadNotes])
 
-  const unprocessed = getUnprocessed().sort(
+  const allUnprocessed = getUnprocessed().sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
+  const notasEIdeas = allUnprocessed.filter((n) => n.type === "idea" || n.type === "nota")
+  const sinProcesar = allUnprocessed.filter((n) => n.type === "tarea" || n.type === "proyecto" || n.type === "general")
   const processed = getProcessed().sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
 
-  const handleCapture = async (content: string) => {
-    await addNote(content)
+  const handleCapture = async (content: string, type: QuickNoteType) => {
+    await addNote(content, type)
   }
 
   const handleProcess = (noteId: string) => {
@@ -59,6 +61,11 @@ export default function InboxPage() {
     setSelectedNote(null)
   }
 
+  const handleSaveAsNote = async (noteId: string) => {
+    await processNote(noteId, { type: "note", targetId: noteId })
+    setSelectedNote(null)
+  }
+
   const handleDismiss = async (noteId: string) => {
     await deleteNote(noteId)
     setSelectedNote(null)
@@ -69,6 +76,7 @@ export default function InboxPage() {
     if (note.processedTo.type === "task") return "→ Tarea"
     if (note.processedTo.type === "project") return "→ Proyecto"
     if (note.processedTo.type === "event") return "→ Evento"
+    if (note.processedTo.type === "note") return "→ Nota"
     return "Procesado"
   }
 
@@ -78,9 +86,9 @@ export default function InboxPage() {
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-ae-text">📥 Inbox</h1>
-          {unprocessed.length > 0 && (
+          {sinProcesar.length > 0 && (
             <span className="inline-flex items-center justify-center rounded-full bg-ae-primordial/20 px-2.5 py-0.5 text-xs font-bold text-ae-primordial">
-              {unprocessed.length}
+              {sinProcesar.length}
             </span>
           )}
         </div>
@@ -93,7 +101,7 @@ export default function InboxPage() {
       <CaptureInput onCapture={handleCapture} />
 
       {/* Empty state */}
-      {isLoaded && unprocessed.length === 0 && processed.length === 0 ? (
+      {isLoaded && allUnprocessed.length === 0 && processed.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <span className="text-4xl">📥</span>
           <p className="text-lg font-semibold text-ae-text">Tu inbox está vacío</p>
@@ -103,19 +111,43 @@ export default function InboxPage() {
         </div>
       ) : (
         <>
-          {/* Unprocessed notes */}
-          {unprocessed.length > 0 && (
+          {/* Notas e Ideas */}
+          {notasEIdeas.length > 0 && (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold text-ae-text-muted uppercase tracking-wider">
+                  Notas e Ideas
+                </h2>
+                <span className="inline-flex items-center justify-center rounded-full bg-ae-surface-2 px-2 py-0.5 text-xs text-ae-text-muted">
+                  {notasEIdeas.length}
+                </span>
+              </div>
+              <div className="flex flex-col gap-2">
+                {notasEIdeas.map((note) => (
+                  <NoteItem
+                    key={note.id}
+                    note={note}
+                    onDelete={handleDelete}
+                    showProcess={false}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sin procesar */}
+          {sinProcesar.length > 0 && (
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-ae-text-muted uppercase tracking-wider">
                   Sin procesar
                 </h2>
                 <span className="inline-flex items-center justify-center rounded-full bg-ae-surface-2 px-2 py-0.5 text-xs text-ae-text-muted">
-                  {unprocessed.length}
+                  {sinProcesar.length}
                 </span>
               </div>
               <div className="flex flex-col gap-2">
-                {unprocessed.map((note) => (
+                {sinProcesar.map((note) => (
                   <NoteItem
                     key={note.id}
                     note={note}
@@ -169,6 +201,7 @@ export default function InboxPage() {
         onClose={() => setSelectedNote(null)}
         onCreateTask={handleCreateTask}
         onCreateProject={handleCreateProject}
+        onSaveAsNote={handleSaveAsNote}
         onDismiss={handleDismiss}
       />
     </div>

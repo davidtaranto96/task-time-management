@@ -9,6 +9,7 @@ interface FocusTimerProps {
   totalSeconds: number
   status: TimerStatus
   mode: TimerMode
+  isBreak?: boolean
   onTick: () => void
 }
 
@@ -28,7 +29,7 @@ function getArcColor(mode: TimerMode): string {
   return '#f59e0b' // ae-primordial amber
 }
 
-export function FocusTimer({ remainingSeconds, totalSeconds, status, mode, onTick }: FocusTimerProps) {
+export function FocusTimer({ remainingSeconds, totalSeconds, status, mode, isBreak = false, onTick }: FocusTimerProps) {
   useEffect(() => {
     if (status !== 'running') return
     const interval = setInterval(() => {
@@ -43,7 +44,7 @@ export function FocusTimer({ remainingSeconds, totalSeconds, status, mode, onTic
   const circumference = 2 * Math.PI * radius
   const progress = totalSeconds > 0 ? (totalSeconds - remainingSeconds) / totalSeconds : 0
   const dashOffset = circumference * (1 - progress)
-  const arcColor = getArcColor(mode)
+  const arcColor = isBreak ? '#22c55e' : getArcColor(mode)
   const isCompleted = status === 'completed'
   const isRunning = status === 'running'
 

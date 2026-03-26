@@ -1,13 +1,22 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
+import type { QuickNoteType } from "@/types"
+
+const TYPE_BUTTONS: { type: QuickNoteType; icon: string; label: string }[] = [
+  { type: "idea", icon: "💡", label: "Idea" },
+  { type: "nota", icon: "📝", label: "Nota" },
+  { type: "tarea", icon: "✅", label: "Tarea" },
+  { type: "proyecto", icon: "🚀", label: "Proyecto" },
+]
 
 interface CaptureInputProps {
-  onCapture: (content: string) => void
+  onCapture: (content: string, type: QuickNoteType) => void
 }
 
 export function CaptureInput({ onCapture }: CaptureInputProps) {
   const [value, setValue] = useState("")
+  const [selectedType, setSelectedType] = useState<QuickNoteType>("general")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -36,8 +45,9 @@ export function CaptureInput({ onCapture }: CaptureInputProps) {
   const submit = () => {
     const trimmed = value.trim()
     if (!trimmed) return
-    onCapture(trimmed)
+    onCapture(trimmed, selectedType)
     setValue("")
+    setSelectedType("general")
     setTimeout(() => {
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto"
@@ -48,6 +58,22 @@ export function CaptureInput({ onCapture }: CaptureInputProps) {
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Type selector */}
+      <div className="flex items-center gap-2">
+        {TYPE_BUTTONS.map((btn) => (
+          <button
+            key={btn.type}
+            onClick={() => setSelectedType(selectedType === btn.type ? "general" : btn.type)}
+            className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+              selectedType === btn.type
+                ? "bg-ae-primordial/15 border-ae-primordial/40 text-ae-primordial"
+                : "bg-ae-surface-2 border-ae-border text-ae-text-muted hover:border-ae-text-muted"
+            }`}
+          >
+            {btn.icon} {btn.label}
+          </button>
+        ))}
+      </div>
       <textarea
         ref={textareaRef}
         value={value}

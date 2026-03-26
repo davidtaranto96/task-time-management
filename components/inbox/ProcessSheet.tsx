@@ -11,6 +11,7 @@ interface ProcessSheetProps {
   onClose: () => void
   onCreateTask: (title: string, priority: TaskPriority, area?: AreaKey) => void
   onCreateProject: (title: string) => void
+  onSaveAsNote: (noteId: string) => void
   onDismiss: (noteId: string) => void
 }
 
@@ -22,7 +23,7 @@ const PRIORITIES: { value: TaskPriority; label: string; color: string }[] = [
 
 type Mode = null | "task" | "project"
 
-export function ProcessSheet({ note, onClose, onCreateTask, onCreateProject, onDismiss }: ProcessSheetProps) {
+export function ProcessSheet({ note, onClose, onCreateTask, onCreateProject, onSaveAsNote, onDismiss }: ProcessSheetProps) {
   const [mode, setMode] = useState<Mode>(null)
   const [taskTitle, setTaskTitle] = useState("")
   const [taskPriority, setTaskPriority] = useState<TaskPriority>("importante")
@@ -173,6 +174,14 @@ export function ProcessSheet({ note, onClose, onCreateTask, onCreateProject, onD
               </div>
             )}
           </div>
+
+          {/* Save as note */}
+          <button
+            onClick={() => { onSaveAsNote(note.id); handleClose() }}
+            className="w-full rounded-xl bg-ae-surface-2 border border-ae-border px-4 py-3 text-left text-sm font-semibold text-ae-text-muted hover:text-ae-text hover:border-ae-text-muted/40 transition-colors"
+          >
+            📝 Guardar como nota
+          </button>
 
           {/* Dismiss */}
           <button

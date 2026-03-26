@@ -8,11 +8,11 @@ interface TimerModeSelectorProps {
   disabled?: boolean
 }
 
-const WORK_MODES: { mode: TimerMode; label: string }[] = [
-  { mode: 'pomodoro_25', label: '25 min' },
-  { mode: 'pomodoro_50', label: '50 min' },
-  { mode: 'deep_work_90', label: '90 min' },
-  { mode: 'quick_5', label: '5 min rápido' },
+const WORK_MODES: { mode: TimerMode; label: string; breakLabel: string }[] = [
+  { mode: 'pomodoro_25', label: '25 min', breakLabel: '5 min break' },
+  { mode: 'pomodoro_50', label: '50 min', breakLabel: '10 min break' },
+  { mode: 'deep_work_90', label: '90 min', breakLabel: '15 min break' },
+  { mode: 'quick_5', label: '5 min rápido', breakLabel: '' },
 ]
 
 const BREAK_MODES: { mode: TimerMode; label: string }[] = [
@@ -26,7 +26,7 @@ export function TimerModeSelector({ selectedMode, onChange, disabled }: TimerMod
     <div className="flex flex-col gap-2">
       {/* Work modes */}
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {WORK_MODES.map(({ mode, label }) => {
+        {WORK_MODES.map(({ mode, label, breakLabel }) => {
           const isSelected = selectedMode === mode
           return (
             <button
@@ -41,7 +41,15 @@ export function TimerModeSelector({ selectedMode, onChange, disabled }: TimerMod
                 disabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer',
               ].join(' ')}
             >
-              {label}
+              <span>{label}</span>
+              {breakLabel && (
+                <span className={[
+                  'block text-[10px] font-normal leading-tight mt-0.5',
+                  isSelected ? 'text-black/60' : 'text-ae-text-muted/60',
+                ].join(' ')}>
+                  → {breakLabel}
+                </span>
+              )}
             </button>
           )
         })}

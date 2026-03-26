@@ -218,12 +218,6 @@ export default function HoyPage() {
           /* A4: plain informational text + proper CTA button */
           <div className="bg-ae-surface rounded-xl p-6 border border-ae-border border-dashed text-center space-y-3">
             <p className="text-ae-text-muted text-sm">Sin prioridades aún. Elegí hasta 3 tareas primordiales para hoy.</p>
-            <button
-              onClick={() => openAddSheet('primordial')}
-              className="text-sm text-ae-primordial font-medium hover:underline"
-            >
-              + Agregar primera prioridad
-            </button>
           </div>
         ) : (
           <div className="space-y-3">
@@ -258,7 +252,7 @@ export default function HoyPage() {
             onClick={() => openAddSheet('primordial')}
             className="w-full text-sm text-ae-primordial/70 hover:text-ae-primordial border border-dashed border-ae-primordial/30 hover:border-ae-primordial/60 rounded-xl py-3 transition-colors"
           >
-            + Agregar prioridad
+            + {primordialTasks.length + donePrimordial.length === 0 ? 'Agregar primera prioridad' : 'Agregar prioridad'}
           </button>
         )}
       </section>
@@ -316,7 +310,7 @@ export default function HoyPage() {
               ))}
               {hasMore && (
                 <Link
-                  href="/bandeja"
+                  href="/inbox"
                   className="block text-center text-sm text-ae-text-muted hover:text-ae-text py-2 transition-colors"
                 >
                   Ver todas las tareas →

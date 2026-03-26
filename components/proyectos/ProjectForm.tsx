@@ -27,17 +27,25 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
   const [targetDate, setTargetDate] = useState(
     project?.targetDate ? project.targetDate.slice(0, 10) : ''
   )
+  const [error, setError] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title.trim()) return
-    onSave({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      category,
-      color,
-      targetDate: targetDate || undefined,
-    })
+    if (!title.trim()) {
+      setError('El nombre es obligatorio')
+      return
+    }
+    try {
+      onSave({
+        title: title.trim(),
+        description: description.trim() || undefined,
+        category,
+        color,
+        targetDate: targetDate || undefined,
+      })
+    } catch {
+      setError('Error al guardar el proyecto')
+    }
   }
 
   return (
@@ -50,11 +58,12 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
         <input
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => { setTitle(e.target.value); if (e.target.value.trim()) setError('') }}
           placeholder="Ej: Lanzar newsletter"
           required
           className="w-full bg-ae-surface-2 border border-ae-border rounded-lg px-3 py-2 text-ae-text placeholder-ae-text-muted focus:outline-none focus:border-ae-primordial text-sm"
         />
+        {error && <p className="text-ae-danger text-xs mt-1">{error}</p>}
       </div>
 
       {/* Description */}
