@@ -1,25 +1,32 @@
-export type TaskZone = "signal" | "noise"
-export type TaskPriority = "primordial" | "secondary"
-export type DecisionType = "type1" | "type2"
-export type TaskAction = "do" | "delegate" | "defer" | "delete"
-export type TaskStatus = "pending" | "in_progress" | "done" | "deferred" | "delegated" | "deleted"
+import type { AreaKey } from './area'
+
+export type TaskPriority = 'primordial' | 'importante' | 'puede_esperar'
+export type TaskAction = 'do' | 'delegate' | 'defer' | 'delete'
+export type TaskStatus = 'pending' | 'in_progress' | 'done' | 'deferred' | 'delegated' | 'deleted'
 
 export interface Task {
   id: string
   title: string
   description?: string
-  zone: TaskZone
   priority: TaskPriority
-  decisionType: DecisionType
   status: TaskStatus
   action?: TaskAction
+  area?: AreaKey
   delegatedTo?: string
-  deferredTo?: string
-  createdAt: string
-  completedAt?: string
+  deferredTo?: string         // YYYY-MM-DD
+  scheduledDate?: string      // YYYY-MM-DD — when this task is scheduled for
+  reminder?: string           // ISO datetime — optional reminder
+  parentProjectId?: string    // links to a Project
+  subtaskIds?: string[]       // ordered subtask IDs
+  createdAt: string           // ISO datetime
+  completedAt?: string        // ISO datetime
   estimatedMinutes?: number
-  isGoldenTask: boolean
-  dayId: string
+  dayId: string               // YYYY-MM-DD — the day this task belongs to
+  // Deprecated fields kept for migration compatibility
+  zone?: 'signal' | 'noise'
+  decisionType?: 'type1' | 'type2'
+  isGoldenTask?: boolean
+  projectId?: string          // old field name, use parentProjectId instead
 }
 
 export interface DailyPlan {

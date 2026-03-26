@@ -9,8 +9,9 @@
   --ae-surface: #111113;
   --ae-surface-2: #1a1a1f;
   --ae-border: #2a2a35;
-  --ae-signal: #f59e0b;
-  --ae-noise: #6b7280;
+  --ae-primordial: #f59e0b;
+  --ae-secondary: #6b7280;
+  --ae-info: #3b82f6;
   --ae-success: #10b981;
   --ae-danger: #ef4444;
   --ae-accent: #8b5cf6;
@@ -50,14 +51,33 @@ body {
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--ae-noise);
+  background: var(--ae-secondary);
 }
 
 /* Focus ring */
 *:focus-visible {
-  outline: 2px solid var(--ae-signal);
+  outline: 2px solid var(--ae-primordial);
   outline-offset: 2px;
 }
+
+@keyframes checkPop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideOut {
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+.animate-check-pop { animation: checkPop 0.25s ease-out forwards; }
+.animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+.animate-slide-out { animation: slideOut 0.3s ease-in forwards; }
 
 @layer utilities {
   .text-balance {

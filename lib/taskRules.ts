@@ -1,78 +1,78 @@
-import type { Task, TaskZone, TaskAction } from '@/types/task'
+import type { Task, TaskPriority, TaskAction } from '@/types'
 
-export const SIGNAL_ZONE_MAX = 2
-export const NOISE_ZONE_MAX = 20
-export const DECISION_FATIGUE_THRESHOLD = 3
-export const CERO_RUIDO_HOUR = 12
+// Max primordial tasks per day (rule of 3)
+export const MAX_PRIMORDIAL = 3
 
-export function wouldTriggerFatigue(currentSignalCount: number): boolean {
-  return currentSignalCount >= DECISION_FATIGUE_THRESHOLD
+// Max secondary tasks visible (practical limit)
+export const MAX_SECONDARY = 20
+
+// Check if adding another primordial task would exceed limit
+export function wouldExceedPrimordial(currentPrimordialCount: number): boolean {
+  return currentPrimordialCount >= MAX_PRIMORDIAL
 }
 
-export function isSignalZoneFull(currentSignalCount: number): boolean {
-  return currentSignalCount >= SIGNAL_ZONE_MAX
+// Recommend priority based on simple heuristics
+export function recommendPriority(): TaskPriority {
+  // Default to puede_esperar — user should actively promote to higher priority
+  return 'puede_esperar'
 }
 
-export function recommendZone(task: Pick<Task, 'priority' | 'decisionType'>): TaskZone {
-  if (task.priority === 'primordial' && task.decisionType === 'type1') {
-    return 'signal'
-  }
-  return 'noise'
-}
-
-function isOlderThanDays(task: Task, days: number): boolean {
-  const created = new Date(task.createdAt).getTime()
-  const now = Date.now()
-  const diffDays = (now - created) / (1000 * 60 * 60 * 24)
-  return diffDays > days
-}
-
+// Recommend 4D action for a task
 export function recommend4D(task: Task): TaskAction {
   if (task.status === 'done') return 'do'
   if (task.delegatedTo) return 'delegate'
-  if (task.zone === 'noise' && isOlderThanDays(task, 1)) return 'defer'
-  if (task.zone === 'noise') return 'defer'
+  if (task.priority === 'puede_esperar' && isOlderThanDays(task, 2)) return 'defer'
+  if (task.priority === 'puede_esperar') return 'defer'
   return 'do'
 }
 
+// Check if a task should be suggested for elimination (older than 3 days, still pending, low priority)
 export function shouldSuggestElimination(task: Task): boolean {
-  return task.zone === 'noise' && task.status === 'pending' && isOlderThanDays(task, 2)
+  return (
+    task.priority === 'puede_esperar' &&
+    task.status === 'pending' &&
+    isOlderThanDays(task, 3)
+  )
 }
 
-export function canMoveToSignal(currentSignalTasks: Task[]): { allowed: boolean; reason?: string } {
-  if (currentSignalTasks.length >= SIGNAL_ZONE_MAX) {
+// Check if a task can be promoted to primordial
+export function canPromoteToPrimordial(currentPrimordialCount: number): { allowed: boolean; reason?: string } {
+  if (currentPrimordialCount >= MAX_PRIMORDIAL) {
     return {
       allowed: false,
-      reason: `La zona de señal solo admite ${SIGNAL_ZONE_MAX} tareas primordiales (Regla Bezos).`,
-    }
-  }
-  if (currentSignalTasks.length >= DECISION_FATIGUE_THRESHOLD) {
-    return {
-      allowed: false,
-      reason: `Superas el umbral de fatiga de decisiones (${DECISION_FATIGUE_THRESHOLD} tareas).`,
+      reason: `Ya tenés ${MAX_PRIMORDIAL} tareas primordiales hoy. Completá o bajá la prioridad de alguna antes de agregar otra.`,
     }
   }
   return { allowed: true }
 }
 
+// Create a new task with sensible defaults
 export function createTask(partial: Partial<Task> & { title: string; dayId: string }): Task {
-  const defaults: Task = {
-    id: crypto.randomUUID(),
+  return {
+    id: partial.id || crypto.randomUUID(),
     title: partial.title,
-    description: undefined,
-    zone: 'noise',
-    priority: 'secondary',
-    decisionType: 'type2',
-    status: 'pending',
-    action: undefined,
-    delegatedTo: undefined,
-    deferredTo: undefined,
-    createdAt: new Date().toISOString(),
-    completedAt: undefined,
-    estimatedMinutes: undefined,
-    isGoldenTask: false,
+    description: partial.description,
+    priority: partial.priority || 'puede_esperar',
+    status: partial.status || 'pending',
+    action: partial.action,
+    area: partial.area,
+    delegatedTo: partial.delegatedTo,
+    deferredTo: partial.deferredTo,
+    scheduledDate: partial.scheduledDate,
+    reminder: partial.reminder,
+    parentProjectId: partial.parentProjectId,
+    subtaskIds: partial.subtaskIds || [],
+    createdAt: partial.createdAt || new Date().toISOString(),
+    completedAt: partial.completedAt,
+    estimatedMinutes: partial.estimatedMinutes,
     dayId: partial.dayId,
   }
+}
 
-  return { ...defaults, ...partial, id: defaults.id, createdAt: defaults.createdAt }
+// Helper: check if task is older than N days
+function isOlderThanDays(task: Task, days: number): boolean {
+  const created = new Date(task.createdAt)
+  const now = new Date()
+  const diff = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
+  return diff > days
 }

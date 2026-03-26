@@ -17,7 +17,7 @@ export function sendTimerCompleteNotification(taskTitle: string, timerMode: Time
 
   if (timerMode === 'pomodoro_25' || timerMode === 'pomodoro_50') {
     body = `Completaste una sesión de trabajo profundo en: ${taskTitle}`
-  } else if (timerMode === 'musk_5') {
+  } else if (timerMode === 'quick_5') {
     body = `Tiempo agotado para: ${taskTitle}. ¡Siguiente!`
   } else {
     body = 'Descanso terminado. ¡Hora de volver al trabajo!'

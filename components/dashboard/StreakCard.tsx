@@ -7,7 +7,7 @@ interface StreakCardProps {
 }
 
 export default function StreakCard({ streak }: StreakCardProps) {
-  if (!streak || streak.currentStreak === 0) {
+  if (!streak || streak.currentCount === 0) {
     return (
       <div className="bg-ae-surface border border-ae-border rounded-2xl p-5 text-center">
         <p className="text-ae-text-muted text-sm">
@@ -17,7 +17,7 @@ export default function StreakCard({ streak }: StreakCardProps) {
     )
   }
 
-  const isWeekStreak = streak.currentStreak >= 7
+  const isWeekStreak = streak.currentCount >= 7
   const borderColor = isWeekStreak ? "#f59e0b60" : "#2a2a35"
   const glowStyle = isWeekStreak
     ? { boxShadow: "0 0 24px #f59e0b22, 0 0 8px #f59e0b11" }
@@ -59,7 +59,7 @@ export default function StreakCard({ streak }: StreakCardProps) {
               color: isWeekStreak ? "#f59e0b" : "#f4f4f5",
             }}
           >
-            {streak.currentStreak}
+            {streak.currentCount}
           </span>
           <span className="text-ae-text-muted text-sm">días consecutivos</span>
         </div>
@@ -68,10 +68,7 @@ export default function StreakCard({ streak }: StreakCardProps) {
       {/* Stats */}
       <div className="flex flex-col gap-1 border-t border-ae-border pt-3">
         <span className="text-ae-text-muted text-sm">
-          🏅 {streak.longestStreak} días — tu mejor racha
-        </span>
-        <span className="text-ae-text-muted text-sm">
-          ✅ {streak.totalSuccessfulDays} días exitosos en total
+          🏅 {streak.longestCount} días — tu mejor racha
         </span>
       </div>
     </div>

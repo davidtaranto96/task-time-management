@@ -14,8 +14,9 @@ const config: Config = {
         "ae-surface": "#111113",
         "ae-surface-2": "#1a1a1f",
         "ae-border": "#2a2a35",
-        "ae-signal": "#f59e0b",    // amber - high signal/primordial
-        "ae-noise": "#6b7280",     // gray - noise/secondary
+        "ae-primordial": "#f59e0b", // amber - high signal/primordial
+        "ae-secondary": "#6b7280", // gray - noise/secondary
+        "ae-info": "#3b82f6",      // blue - informational
         "ae-success": "#10b981",   // emerald - success/done
         "ae-danger": "#ef4444",    // red - delete/danger
         "ae-accent": "#8b5cf6",    // violet - accent/CEO mode

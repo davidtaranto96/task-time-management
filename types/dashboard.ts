@@ -1,11 +1,10 @@
-import type { TaskZone } from "./task"
 import type { TimerMode } from "./timer"
 
 export interface ImpactSession {
   id: string
   taskId: string
   taskTitle: string
-  zone: TaskZone
+  zone: 'signal' | 'noise' | 'primordial' | 'secondary'
   startedAt: string
   endedAt: string
   durationMinutes: number
@@ -14,17 +13,20 @@ export interface ImpactSession {
 }
 
 export interface DayMetrics {
+  id: string
   dayId: string
   isSuccessful: boolean
-  primordialTasksTotal: number
-  primordialTasksDone: number
+  primordialTotal: number
+  primordialDone: number
   highImpactHours: number
   totalImpactSessions: number
+  createdAt: string
 }
 
 export interface Streak {
-  currentStreak: number
-  longestStreak: number
+  id: string
+  currentCount: number
+  longestCount: number
   lastSuccessfulDay: string | null
-  totalSuccessfulDays: number
+  updatedAt: string
 }

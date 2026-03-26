@@ -1,253 +1,186 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Task, DailyPlan, TaskZone, TaskPriority, DecisionType, TaskStatus, TaskAction } from '@/types/task'
-import {
-  saveTask,
-  getTasksByDay,
-  deleteTask as dbDeleteTask,
-  saveDailyPlan,
-  getDailyPlan,
-} from '@/lib/db'
-import { createTask, canMoveToSignal, DECISION_FATIGUE_THRESHOLD } from '@/lib/taskRules'
-import { getTodayId } from '@/lib/dateUtils'
 import { createIDBStorage } from '@/lib/persistence'
+import { createTask } from '@/lib/taskRules'
+import { getTodayId } from '@/lib/dateUtils'
+import * as db from '@/lib/db'
+import type { Task, TaskPriority, TaskAction } from '@/types'
+import type { AreaKey } from '@/types/area'
 
 interface TaskStoreState {
   tasks: Record<string, Task>
-  dailyPlan: DailyPlan | null
+  dailyPlan: { dayId: string; tasks: string[]; createdAt: string } | null
   todayId: string
   isLoaded: boolean
 
+  // Actions
   loadToday: () => Promise<void>
   addTask: (partial: Partial<Task> & { title: string }) => Promise<Task>
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>
   removeTask: (id: string) => Promise<void>
-
   completeTask: (id: string) => Promise<void>
+  uncompleteTask: (id: string) => Promise<void>
   deferTask: (id: string, deferTo?: string) => Promise<void>
   delegateTask: (id: string, delegateTo: string) => Promise<void>
   deleteTask: (id: string) => Promise<void>
+  scheduleTask: (id: string, date: string) => Promise<void>
 
-  moveToSignal: (id: string) => Promise<{ success: boolean; reason?: string }>
-  moveToNoise: (id: string) => Promise<void>
-  setGoldenTask: (id: string) => Promise<void>
-
-  setGoldenQuestion: (question: string) => Promise<void>
-
-  getSignalTasks: () => Task[]
-  getNoiseTasks: () => Task[]
+  // Selectors
+  getTodayPrimordial: () => Task[]
+  getTodaySecondary: () => Task[]
   getActiveTasks: () => Task[]
-  getGoldenTask: () => Task | null
-  getSignalCount: () => number
-  wouldTriggerFatigue: () => boolean
-}
-
-function getTomorrow(): string {
-  const d = new Date()
-  d.setDate(d.getDate() + 1)
-  return d.toISOString().slice(0, 10)
+  getPrimordialCount: () => number
+  getTodayStats: () => { total: number; done: number; deferred: number; pending: number }
 }
 
 export const useTaskStore = create<TaskStoreState>()(
   persist(
     (set, get) => ({
-      tasks: {},
+      tasks: {} as Record<string, Task>,
       dailyPlan: null,
       todayId: getTodayId(),
       isLoaded: false,
 
       loadToday: async () => {
         const todayId = getTodayId()
-        const taskList = await getTasksByDay(todayId)
-        const tasks: Record<string, Task> = {}
-        for (const t of taskList) {
-          tasks[t.id] = t
+        const dayTasks = await db.getTasksByDay(todayId)
+        const tasksRecord: Record<string, Task> = {}
+        for (const t of dayTasks) {
+          tasksRecord[t.id] = t
         }
-        const dailyPlan = await getDailyPlan(todayId)
-        set({ tasks, dailyPlan, todayId, isLoaded: true })
+        const plan = await db.getDailyPlan(todayId)
+        set({ tasks: tasksRecord, dailyPlan: plan || null, todayId, isLoaded: true })
       },
 
       addTask: async (partial) => {
-        const state = get()
-        const task = createTask({ ...partial, dayId: state.todayId })
-        await saveTask(task)
-        set((s) => ({ tasks: { ...s.tasks, [task.id]: task } }))
+        const { todayId } = get()
+        const task = createTask({ ...partial, dayId: partial.dayId || todayId })
+        await db.saveTask(task)
+        set((state) => ({ tasks: { ...state.tasks, [task.id]: task } }))
         return task
       },
 
       updateTask: async (id, updates) => {
-        const state = get()
-        const existing = state.tasks[id]
-        if (!existing) return
-        const updated = { ...existing, ...updates }
-        await saveTask(updated)
-        set((s) => ({ tasks: { ...s.tasks, [id]: updated } }))
+        const task = get().tasks[id]
+        if (!task) return
+        const updated = { ...task, ...updates }
+        await db.saveTask(updated)
+        set((state) => ({ tasks: { ...state.tasks, [id]: updated } }))
       },
 
       removeTask: async (id) => {
-        await dbDeleteTask(id)
-        set((s) => {
-          const tasks = { ...s.tasks }
-          delete tasks[id]
-          return { tasks }
+        await db.deleteTask(id)
+        set((state) => {
+          const { [id]: _, ...rest } = state.tasks
+          return { tasks: rest }
         })
       },
 
       completeTask: async (id) => {
-        const state = get()
-        const task = state.tasks[id]
+        const task = get().tasks[id]
         if (!task) return
-        const updated: Task = {
-          ...task,
-          status: 'done' as TaskStatus,
-          completedAt: new Date().toISOString(),
-        }
-        await saveTask(updated)
-        set((s) => ({ tasks: { ...s.tasks, [id]: updated } }))
+        const updated = { ...task, status: 'done' as const, action: 'do' as const, completedAt: new Date().toISOString() }
+        await db.saveTask(updated)
+        set((state) => ({ tasks: { ...state.tasks, [id]: updated } }))
+      },
+
+      uncompleteTask: async (id) => {
+        const task = get().tasks[id]
+        if (!task) return
+        const updated = { ...task, status: 'pending' as const, completedAt: undefined }
+        await db.saveTask(updated)
+        set((state) => ({ tasks: { ...state.tasks, [id]: updated } }))
       },
 
       deferTask: async (id, deferTo) => {
-        const state = get()
-        const task = state.tasks[id]
+        const task = get().tasks[id]
         if (!task) return
-        const updated: Task = {
+        const tomorrow = new Date()
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        const year = tomorrow.getFullYear()
+        const month = String(tomorrow.getMonth() + 1).padStart(2, '0')
+        const day = String(tomorrow.getDate()).padStart(2, '0')
+        const tomorrowId = `${year}-${month}-${day}`
+        const deferDate = deferTo || tomorrowId
+        const updated = {
           ...task,
-          status: 'deferred' as TaskStatus,
-          action: 'defer' as TaskAction,
-          deferredTo: deferTo ?? getTomorrow(),
+          status: 'pending' as const,
+          action: 'defer' as const,
+          deferredTo: deferDate,
+          scheduledDate: deferDate,
+          dayId: deferDate,
         }
-        await saveTask(updated)
-        set((s) => ({ tasks: { ...s.tasks, [id]: updated } }))
+        await db.saveTask(updated)
+        set((state) => ({ tasks: { ...state.tasks, [id]: updated } }))
       },
 
       delegateTask: async (id, delegateTo) => {
-        const state = get()
-        const task = state.tasks[id]
+        const task = get().tasks[id]
         if (!task) return
-        const updated: Task = {
-          ...task,
-          status: 'delegated' as TaskStatus,
-          action: 'delegate' as TaskAction,
-          delegatedTo: delegateTo,
-        }
-        await saveTask(updated)
-        set((s) => ({ tasks: { ...s.tasks, [id]: updated } }))
+        const updated = { ...task, status: 'delegated' as const, action: 'delegate' as const, delegatedTo: delegateTo }
+        await db.saveTask(updated)
+        set((state) => ({ tasks: { ...state.tasks, [id]: updated } }))
       },
 
       deleteTask: async (id) => {
-        const state = get()
-        const task = state.tasks[id]
+        const task = get().tasks[id]
         if (!task) return
-        const updated: Task = {
-          ...task,
-          status: 'deleted' as TaskStatus,
-          action: 'delete' as TaskAction,
-        }
-        await saveTask(updated)
-        set((s) => ({ tasks: { ...s.tasks, [id]: updated } }))
+        const updated = { ...task, status: 'deleted' as const, action: 'delete' as const }
+        await db.saveTask(updated)
+        set((state) => ({ tasks: { ...state.tasks, [id]: updated } }))
       },
 
-      moveToSignal: async (id) => {
-        const state = get()
-        const task = state.tasks[id]
-        if (!task) return { success: false, reason: 'Task not found' }
-        const signalTasks = get().getSignalTasks()
-        const result = canMoveToSignal(task, signalTasks)
-        if (!result.success) return result
-        const updated: Task = {
-          ...task,
-          zone: 'signal' as TaskZone,
-          priority: 'primordial' as TaskPriority,
-          decisionType: 'type1' as DecisionType,
-        }
-        await saveTask(updated)
-        set((s) => ({ tasks: { ...s.tasks, [id]: updated } }))
-        return { success: true }
-      },
-
-      moveToNoise: async (id) => {
-        const state = get()
-        const task = state.tasks[id]
+      scheduleTask: async (id, date) => {
+        const task = get().tasks[id]
         if (!task) return
-        const updated: Task = {
-          ...task,
-          zone: 'noise' as TaskZone,
-        }
-        await saveTask(updated)
-        set((s) => ({ tasks: { ...s.tasks, [id]: updated } }))
+        const updated = { ...task, scheduledDate: date, dayId: date }
+        await db.saveTask(updated)
+        set((state) => ({ tasks: { ...state.tasks, [id]: updated } }))
       },
 
-      setGoldenTask: async (id) => {
-        const state = get()
-        const updates: Record<string, Task> = {}
-        for (const [tid, task] of Object.entries(state.tasks)) {
-          if (task.isGoldenTask && tid !== id) {
-            const updated = { ...task, isGoldenTask: false }
-            await saveTask(updated)
-            updates[tid] = updated
-          }
-        }
-        const target = state.tasks[id]
-        if (target) {
-          const updated = { ...target, isGoldenTask: true }
-          await saveTask(updated)
-          updates[id] = updated
-        }
-        set((s) => ({ tasks: { ...s.tasks, ...updates } }))
+      getTodayPrimordial: (): Task[] => {
+        const { tasks, todayId } = get()
+        return Object.values(tasks)
+          .filter((t) => t.dayId === todayId && t.priority === 'primordial' && t.status !== 'deleted')
+          .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
       },
 
-      setGoldenQuestion: async (question) => {
-        const state = get()
-        const todayId = state.todayId
-        const plan: DailyPlan = state.dailyPlan
-          ? { ...state.dailyPlan, goldenQuestion: question }
-          : { id: todayId, goldenQuestion: question, createdAt: new Date().toISOString() }
-        await saveDailyPlan(plan)
-        set({ dailyPlan: plan })
+      getTodaySecondary: (): Task[] => {
+        const { tasks, todayId } = get()
+        return Object.values(tasks)
+          .filter((t) => t.dayId === todayId && t.priority !== 'primordial' && t.status === 'pending')
+          .sort((a, b) => {
+            if (a.priority === 'importante' && b.priority !== 'importante') return -1
+            if (b.priority === 'importante' && a.priority !== 'importante') return 1
+            return a.createdAt.localeCompare(b.createdAt)
+          })
       },
 
-      getSignalTasks: () => {
-        const state = get()
-        return Object.values(state.tasks).filter(
-          (t) =>
-            t.dayId === state.todayId &&
-            t.zone === 'signal' &&
-            t.status !== 'deleted' &&
-            t.status !== 'delegated'
+      getActiveTasks: (): Task[] => {
+        const { tasks, todayId } = get()
+        return Object.values(tasks).filter(
+          (t) => t.dayId === todayId && t.status !== 'deleted' && t.status !== 'deferred' && t.status !== 'delegated'
         )
       },
 
-      getNoiseTasks: () => {
-        const state = get()
-        return Object.values(state.tasks).filter(
-          (t) =>
-            t.dayId === state.todayId &&
-            t.zone === 'noise' &&
-            t.status !== 'deleted'
+      getPrimordialCount: (): number => {
+        const { tasks, todayId } = get()
+        return Object.values(tasks).filter(
+          (t) => t.dayId === todayId && t.priority === 'primordial' && t.status !== 'deleted' && t.status !== 'done'
+        ).length
+      },
+
+      getTodayStats: (): { total: number; done: number; deferred: number; pending: number } => {
+        const { tasks, todayId } = get()
+        const todayTasks = Object.values(tasks).filter(
+          (t) => t.dayId === todayId && t.status !== 'deleted'
         )
-      },
-
-      getActiveTasks: () => {
-        const state = get()
-        return Object.values(state.tasks).filter(
-          (t) =>
-            t.dayId === state.todayId &&
-            t.status !== 'deleted' &&
-            t.status !== 'deferred'
-        )
-      },
-
-      getGoldenTask: () => {
-        const state = get()
-        return Object.values(state.tasks).find((t) => t.isGoldenTask) ?? null
-      },
-
-      getSignalCount: () => {
-        return get().getSignalTasks().length
-      },
-
-      wouldTriggerFatigue: () => {
-        return get().getSignalCount() >= DECISION_FATIGUE_THRESHOLD
+        return {
+          total: todayTasks.length,
+          done: todayTasks.filter((t) => t.status === 'done').length,
+          deferred: todayTasks.filter((t) => t.action === 'defer').length,
+          pending: todayTasks.filter((t) => t.status === 'pending').length,
+        }
       },
     }),
     {

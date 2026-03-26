@@ -19,6 +19,12 @@ interface TimerStoreState {
   progressPercent: () => number
 }
 
+const BREAK_MAP: Partial<Record<TimerMode, TimerMode>> = {
+  pomodoro_25: 'break_5',
+  pomodoro_50: 'break_10',
+  deep_work_90: 'break_15',
+}
+
 const initialTimer: TimerState = {
   mode: 'pomodoro_50',
   status: 'idle' as TimerStatus,
@@ -27,6 +33,8 @@ const initialTimer: TimerState = {
   totalSeconds: TIMER_DURATIONS['pomodoro_50'],
   sessionsCompleted: 0,
   startedAt: null,
+  isBreak: false,
+  breakMode: null,
 }
 
 export const useTimerStore = create<TimerStoreState>()((set, get) => ({
@@ -60,16 +68,30 @@ export const useTimerStore = create<TimerStoreState>()((set, get) => ({
   },
 
   stopTimer: () => {
-    set((s) => ({
-      timer: {
-        ...s.timer,
-        status: 'idle' as TimerStatus,
-        activeTaskId: null,
-        startedAt: null,
-        remainingSeconds: TIMER_DURATIONS[s.timer.mode],
-        totalSeconds: TIMER_DURATIONS[s.timer.mode],
-      },
-    }))
+    set((s) => {
+      // If we're in a break, restore the original work mode
+      const baseMode = s.timer.isBreak
+        ? (s.timer.breakMode ?? s.timer.mode) // breakMode holds the break; we want the original — stored in startedAt context; fall back to mode
+        : s.timer.mode
+      // Safest: just use the mode before the break started. Since we always
+      // overwrite `mode` when starting a break, restore from breakMode's pair
+      // We don't store original work mode, so reset to current mode if not break,
+      // or pomodoro_50 default if break is active.
+      const resetMode: TimerMode = s.timer.isBreak ? 'pomodoro_50' : s.timer.mode
+      return {
+        timer: {
+          ...s.timer,
+          mode: resetMode,
+          status: 'idle' as TimerStatus,
+          activeTaskId: null,
+          startedAt: null,
+          remainingSeconds: TIMER_DURATIONS[resetMode],
+          totalSeconds: TIMER_DURATIONS[resetMode],
+          isBreak: false,
+          breakMode: null,
+        },
+      }
+    })
   },
 
   tickTimer: () => {
@@ -85,15 +107,50 @@ export const useTimerStore = create<TimerStoreState>()((set, get) => ({
   },
 
   completeTimer: () => {
+    const { timer } = get()
+
+    if (timer.isBreak) {
+      // Break finished — return to idle
+      set((s) => ({
+        timer: {
+          ...s.timer,
+          status: 'idle' as TimerStatus,
+          remainingSeconds: 0,
+          isBreak: false,
+          breakMode: null,
+        },
+      }))
+      return
+    }
+
+    // Work session finished
+    const breakMode = BREAK_MAP[timer.mode] ?? null
     set((s) => ({
       timer: {
         ...s.timer,
         status: 'completed' as TimerStatus,
         remainingSeconds: 0,
         sessionsCompleted: s.timer.sessionsCompleted + 1,
+        breakMode,
       },
     }))
-    sendTimerCompleteNotification()
+    sendTimerCompleteNotification('', timer.mode)
+
+    if (breakMode) {
+      setTimeout(() => {
+        const breakDuration = TIMER_DURATIONS[breakMode]
+        set((s) => ({
+          timer: {
+            ...s.timer,
+            mode: breakMode,
+            isBreak: true,
+            status: 'running' as TimerStatus,
+            remainingSeconds: breakDuration,
+            totalSeconds: breakDuration,
+          },
+        }))
+      }, 2000)
+    }
   },
 
   setMode: (mode) => {

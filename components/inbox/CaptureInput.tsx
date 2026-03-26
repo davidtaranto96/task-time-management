@@ -1,0 +1,73 @@
+"use client"
+
+import { useRef, useEffect, useState } from "react"
+
+interface CaptureInputProps {
+  onCapture: (content: string) => void
+}
+
+export function CaptureInput({ onCapture }: CaptureInputProps) {
+  const [value, setValue] = useState("")
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    textareaRef.current?.focus()
+  }, [])
+
+  const autoResize = () => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = "auto"
+    el.style.height = el.scrollHeight + "px"
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(e.target.value)
+    autoResize()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && e.ctrlKey) {
+      e.preventDefault()
+      submit()
+    }
+  }
+
+  const submit = () => {
+    const trimmed = value.trim()
+    if (!trimmed) return
+    onCapture(trimmed)
+    setValue("")
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto"
+        textareaRef.current.focus()
+      }
+    }, 0)
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <textarea
+        ref={textareaRef}
+        value={value}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        placeholder="Anotá lo que tengas en mente..."
+        rows={3}
+        className="w-full resize-none rounded-xl bg-ae-surface-2 border border-ae-border p-4 text-ae-text placeholder:text-ae-text-muted focus:outline-none focus:ring-2 focus:ring-ae-primordial/60 transition-all"
+        style={{ minHeight: "80px" }}
+      />
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-ae-text-muted">Ctrl+Enter para capturar</span>
+        <button
+          onClick={submit}
+          disabled={!value.trim()}
+          className="rounded-lg bg-ae-primordial px-4 py-2 text-sm font-semibold text-ae-bg transition-opacity disabled:opacity-40 hover:opacity-90"
+        >
+          Capturar
+        </button>
+      </div>
+    </div>
+  )
+}

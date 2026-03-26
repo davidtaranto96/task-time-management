@@ -72,6 +72,7 @@ export const useDashboardStore = create<DashboardStoreState>()(
           primordialDone: primordialDone.length,
           highImpactHours,
           isSuccessful,
+          totalImpactSessions: sessions.length,
           createdAt: new Date().toISOString(),
         }
 
