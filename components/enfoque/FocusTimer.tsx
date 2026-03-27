@@ -37,8 +37,8 @@ export function FocusTimer({ remainingSeconds, totalSeconds, status, mode, isBre
     return () => clearInterval(t)
   }, [status])
 
-  const size = 220
-  const strokeWidth = 14
+  const size = 180
+  const strokeWidth = 12
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
   const progress = totalSeconds > 0 ? (totalSeconds - remainingSeconds) / totalSeconds : 0
