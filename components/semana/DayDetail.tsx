@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { saveTask, deleteTask as dbDeleteTask } from '@/lib/db'
+import { generateId } from '@/lib/generateId'
 import type { Task, TaskPriority } from '@/types/task'
 
 interface DayDetailProps {
@@ -43,7 +44,7 @@ export default function DayDetail({ dayId, tasks, onTasksChange }: DayDetailProp
     const title = newTaskTitle.trim()
     if (!title) return
     const newTask: Task = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       title,
       priority: newTaskPriority,
       status: 'pending',

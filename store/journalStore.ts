@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { saveJournalEntry, getJournalEntry, getAllJournalEntries, deleteJournalEntry } from '@/lib/db'
 import { createIDBStorage } from '@/lib/persistence'
+import { generateId } from '@/lib/generateId'
 import type { JournalEntry } from '@/types'
 
 function getTodayDayId(): string {
@@ -30,7 +31,7 @@ export const useJournalStore = create<JournalStoreState>()(
         let entry = await getJournalEntry(targetDayId)
         if (!entry) {
           entry = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             dayId: targetDayId,
             reflection: '',
             mood: undefined,

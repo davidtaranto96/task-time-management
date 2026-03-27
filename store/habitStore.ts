@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { get as idbGet, set as idbSet, del as idbDel, keys as idbKeys } from 'idb-keyval'
 import { createIDBStorage } from '@/lib/persistence'
+import { generateId } from '@/lib/generateId'
 import type { Habit, HabitCompletion } from '@/types'
 
 interface HabitStoreState {
@@ -54,7 +55,7 @@ export const useHabitStore = create<HabitStoreState>()(
 
       addHabit: async (partial) => {
         const habit: Habit = {
-          id: crypto.randomUUID(),
+          id: generateId(),
           title: partial.title,
           description: partial.description,
           frequency: partial.frequency ?? 'daily',
@@ -106,7 +107,7 @@ export const useHabitStore = create<HabitStoreState>()(
           }))
         } else {
           const completion: HabitCompletion = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             habitId,
             dayId,
             completedAt: new Date().toISOString(),

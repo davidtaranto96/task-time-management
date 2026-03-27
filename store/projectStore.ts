@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { saveProject, getAllProjects, deleteProject } from '@/lib/db'
 import { createIDBStorage } from '@/lib/persistence'
+import { generateId } from '@/lib/generateId'
 import type { Project, ProjectCategory } from '@/types'
 
 interface ProjectStoreState {
@@ -41,7 +42,7 @@ export const useProjectStore = create<ProjectStoreState>()(
 
       addProject: async (partial) => {
         const project: Project = {
-          id: crypto.randomUUID(),
+          id: generateId(),
           title: partial.title,
           description: partial.description,
           category: partial.category ?? 'personal',

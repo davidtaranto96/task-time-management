@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { saveQuickNote, getQuickNote, getAllQuickNotes, deleteQuickNote } from '@/lib/db'
 import { createIDBStorage } from '@/lib/persistence'
+import { generateId } from '@/lib/generateId'
 import type { QuickNote, QuickNoteType } from '@/types'
 
 interface InboxStoreState {
@@ -39,7 +40,7 @@ export const useInboxStore = create<InboxStoreState>()(
 
       addNote: async (content, type = 'general') => {
         const note: QuickNote = {
-          id: crypto.randomUUID(),
+          id: generateId(),
           content,
           type,
           isProcessed: false,

@@ -1,4 +1,5 @@
 import type { Task, TaskPriority, TaskAction } from '@/types'
+import { generateId } from '@/lib/generateId'
 
 // Max primordial tasks per day (rule of 3)
 export const MAX_PRIMORDIAL = 3
@@ -49,7 +50,7 @@ export function canPromoteToPrimordial(currentPrimordialCount: number): { allowe
 // Create a new task with sensible defaults
 export function createTask(partial: Partial<Task> & { title: string; dayId: string }): Task {
   return {
-    id: partial.id || crypto.randomUUID(),
+    id: partial.id || generateId(),
     title: partial.title,
     description: partial.description,
     priority: partial.priority || 'puede_esperar',

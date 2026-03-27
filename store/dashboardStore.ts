@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { generateId } from '@/lib/generateId'
 import type { ImpactSession, DayMetrics, Streak } from '@/types/dashboard'
 import type { Task } from '@/types/task'
 import {
@@ -43,7 +44,7 @@ export const useDashboardStore = create<DashboardStoreState>()(
       },
 
       addImpactSession: async (session) => {
-        const full: ImpactSession = { ...session, id: crypto.randomUUID() }
+        const full: ImpactSession = { ...session, id: generateId() }
         await saveImpactSession(full)
         set((s) => ({ sessions: [...s.sessions, full] }))
       },
