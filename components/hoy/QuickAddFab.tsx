@@ -81,7 +81,7 @@ export default function QuickAddFab({ onAdd, defaultPriority = 'puede_esperar', 
     >
       {/* Expanded form */}
       {expanded && (
-        <div className="bg-ae-surface border border-ae-border rounded-2xl shadow-2xl p-4 w-80 flex flex-col gap-3">
+        <div className="card-m3 shadow-2xl p-4 w-80 flex flex-col gap-3">
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <input
               ref={inputRef}
@@ -123,9 +123,9 @@ export default function QuickAddFab({ onAdd, defaultPriority = 'puede_esperar', 
       {/* FAB button */}
       <button
         onClick={() => setExpanded((v) => !v)}
-        className={`w-12 h-12 rounded-full bg-ae-primordial text-black shadow-lg hover:bg-ae-primordial/90 transition-all flex items-center justify-center text-xl font-light ${
+        className={`w-14 h-14 rounded-full bg-ae-primordial text-black shadow-xl shadow-ae-primordial/30 tap-spring flex items-center justify-center text-2xl font-light transition-transform duration-200 ${
           expanded ? 'rotate-45' : 'rotate-0'
-        } transition-transform duration-200`}
+        }`}
         title="Agregar tarea"
         aria-label="Agregar tarea"
       >

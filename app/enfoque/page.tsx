@@ -205,14 +205,14 @@ export default function EnfoquePage() {
               {selectedTaskId && (
                 <button
                   onClick={handleMarkDone}
-                  className="rounded-xl bg-green-500 px-5 py-2.5 text-sm font-semibold text-black active:scale-95 transition-transform"
+                  className="btn-primary bg-green-500 text-black"
                 >
                   ✅ La completé
                 </button>
               )}
               <button
                 onClick={handleAnotherSession}
-                className="rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-black active:scale-95 transition-transform"
+                className="btn-secondary bg-amber-500 text-black"
               >
                 {selectedTaskId ? '⏭ Seguir pendiente' : 'Otra sesión'}
               </button>
@@ -235,21 +235,21 @@ export default function EnfoquePage() {
                 {!isActive ? (
                   <button
                     onClick={handleStart}
-                    className="rounded-2xl bg-amber-500 px-10 py-3 text-base font-bold text-black active:scale-95 transition-transform shadow-lg shadow-amber-500/20"
+                    className="btn-primary bg-amber-500 text-black"
                   >
                     {timer.sessionsCompleted > 0 ? 'Empezar' : 'Iniciar'}
                   </button>
                 ) : running ? (
                   <button
                     onClick={pauseTimer}
-                    className="rounded-2xl bg-amber-500 px-10 py-3 text-base font-bold text-black active:scale-95 transition-transform"
+                    className="btn-primary bg-amber-500 text-black"
                   >
                     Pausar
                   </button>
                 ) : (
                   <button
                     onClick={resumeTimer}
-                    className="rounded-2xl bg-amber-500 px-10 py-3 text-base font-bold text-black active:scale-95 transition-transform"
+                    className="btn-primary bg-amber-500 text-black"
                   >
                     Continuar
                   </button>
@@ -257,7 +257,7 @@ export default function EnfoquePage() {
                 {isActive && (
                   <button
                     onClick={handleStop}
-                    className="rounded-2xl bg-ae-surface-2 border border-ae-border px-5 py-3 text-sm font-medium text-ae-text-muted active:scale-95 transition-transform"
+                    className="btn-secondary bg-ae-surface-2 border border-ae-border text-ae-text-muted"
                   >
                     Detener
                   </button>
@@ -269,7 +269,7 @@ export default function EnfoquePage() {
               <div className="flex justify-center">
                 <button
                   onClick={handleStop}
-                  className="rounded-2xl bg-ae-surface-2 border border-ae-border px-6 py-2.5 text-sm font-medium text-ae-text-muted active:scale-95 transition-transform"
+                  className="btn-secondary bg-ae-surface-2 border border-ae-border text-ae-text-muted"
                 >
                   Saltar descanso
                 </button>

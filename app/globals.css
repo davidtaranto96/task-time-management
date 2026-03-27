@@ -12,6 +12,48 @@
     line-height: 1.15;
     letter-spacing: -0.025em;
   }
+
+  /* ── M3 Expressive: botones pill ── */
+  .btn-primary {
+    border-radius: 9999px;
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 150ms ease,
+                box-shadow 150ms ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .btn-primary:active {
+    transform: scale(0.94);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .btn-secondary {
+    border-radius: 9999px;
+    font-weight: 500;
+    padding: 0.625rem 1.5rem;
+    transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 150ms ease;
+  }
+  .btn-secondary:active {
+    transform: scale(0.95);
+  }
+
+  /* ── M3 Expressive: cards elevadas ── */
+  .card-m3 {
+    border-radius: 1.5rem;
+    background: var(--ae-surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.2);
+  }
+
+  /* ── M3 Expressive: spring tap para cualquier botón ── */
+  .tap-spring {
+    transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .tap-spring:active {
+    transform: scale(0.93);
+  }
 }
 
 :root {

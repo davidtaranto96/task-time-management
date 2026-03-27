@@ -42,7 +42,12 @@ export default function DayDetail({ dayId, tasks, onTasksChange }: DayDetailProp
   const dateStr = `${date.getDate()} ${MONTHS[date.getMonth()]}`
 
   const activeTasks = tasks.filter((t) => t.status !== 'deleted')
-  const filteredTasks = priorityFilter === 'all' ? activeTasks : activeTasks.filter(t => t.priority === priorityFilter)
+  const filteredTasks = (priorityFilter === 'all' ? activeTasks : activeTasks.filter(t => t.priority === priorityFilter))
+    .sort((a, b) => {
+      if (a.status === 'done' && b.status !== 'done') return 1
+      if (a.status !== 'done' && b.status === 'done') return -1
+      return 0
+    })
 
   const handleAddTask = async () => {
     const title = newTaskTitle.trim()
@@ -100,16 +105,16 @@ export default function DayDetail({ dayId, tasks, onTasksChange }: DayDetailProp
 
   const handleDelete = async (task: Task) => {
     setDeletingId(task.id)
-    await dbDeleteTask(task.id)
-    // Small delay for visual feedback
-    setTimeout(() => {
+    try {
+      await dbDeleteTask(task.id)
       const map: Record<string, Task> = {}
       for (const t of tasks) {
         if (t.id !== task.id) map[t.id] = t
       }
       onTasksChange(map)
+    } finally {
       setDeletingId(null)
-    }, 200)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -152,7 +157,7 @@ export default function DayDetail({ dayId, tasks, onTasksChange }: DayDetailProp
         })}
       </div>
 
-      <div className="bg-ae-surface rounded-xl border border-ae-border p-4">
+      <div className="card-m3 p-4">
         {filteredTasks.length === 0 ? (
           <p className="text-center text-ae-text-muted text-sm py-4">Sin tareas para este día</p>
         ) : (
