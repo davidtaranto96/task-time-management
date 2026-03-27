@@ -10,7 +10,7 @@ import { getTodayId } from '@/lib/dateUtils'
 import type { TaskPriority } from '@/types/task'
 import { hapticSuccess, hapticLight } from '@/lib/haptics'
 import { getUserName } from '@/lib/userSettings'
-import { getDailyPhrase } from '@/lib/motivationalPhrases'
+import { getRandomPhrase } from '@/lib/motivationalPhrases'
 
 import DayProgress from '@/components/hoy/DayProgress'
 import PriorityCard from '@/components/hoy/PriorityCard'
@@ -56,7 +56,7 @@ export default function HoyPage() {
 
   useEffect(() => {
     setUserName(getUserName())
-    setPhrase(getDailyPhrase())
+    setPhrase(getRandomPhrase())
   }, [])
 
   // Run migrations once on first load
@@ -163,6 +163,20 @@ export default function HoyPage() {
       }, 300)
     },
     [deferTask]
+  )
+
+  const handleEditTask = useCallback(
+    async (id: string, changes: { title?: string; priority?: TaskPriority }) => {
+      await updateTask(id, changes)
+    },
+    [updateTask]
+  )
+
+  const handleDeleteTask = useCallback(
+    async (id: string) => {
+      await deleteTask(id)
+    },
+    [deleteTask]
   )
 
   const showSecondary = secondaryTasks.length > 0
@@ -323,6 +337,8 @@ export default function HoyPage() {
                   onComplete={() => completeTask(task.id)}
                   onDefer={() => handleDefer(task.id)}
                   onPromote={() => handlePromote(task.id)}
+                  onEdit={handleEditTask}
+                  onDelete={handleDeleteTask}
                 />
               ))}
               {hasMore && (

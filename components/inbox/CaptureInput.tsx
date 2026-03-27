@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
+import { useRef, useState } from "react"
 import type { QuickNoteType } from "@/types"
 
 const TYPE_BUTTONS: { type: QuickNoteType; icon: string; label: string }[] = [
@@ -19,9 +19,7 @@ export function CaptureInput({ onCapture }: CaptureInputProps) {
   const [selectedType, setSelectedType] = useState<QuickNoteType>("general")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  useEffect(() => {
-    textareaRef.current?.focus()
-  }, [])
+  // No autofocus on mount — user should tap manually to avoid keyboard pop on navigation
 
   const autoResize = () => {
     const el = textareaRef.current

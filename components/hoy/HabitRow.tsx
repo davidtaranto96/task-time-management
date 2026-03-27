@@ -37,7 +37,7 @@ export default function HabitRow({ habits, todayId, isCompleted, onToggle, getSt
           <button
             key={habit.id}
             onClick={() => { hapticLight(); onToggle(habit.id) }}
-            className={`flex-shrink-0 flex flex-col items-center gap-1.5 rounded-2xl px-3 py-3 w-[78px] border-2 transition-all active:scale-95 ${
+            className={`flex-shrink-0 flex flex-col items-center gap-1.5 rounded-2xl px-3 py-3 w-[90px] min-h-[88px] border-2 transition-all active:scale-95 ${
               done
                 ? 'bg-ae-success/10 border-ae-success'
                 : 'bg-ae-surface border-ae-border hover:border-ae-primordial/50'

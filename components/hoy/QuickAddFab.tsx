@@ -14,6 +14,7 @@ const PRIORITY_OPTIONS: { value: TaskPriority; label: string; color: string }[] 
   { value: 'primordial', label: 'Primordial', color: 'text-ae-primordial border-ae-primordial/40 bg-ae-primordial/10' },
   { value: 'importante', label: 'Importante', color: 'text-ae-info border-ae-info/40 bg-ae-info/10' },
   { value: 'puede_esperar', label: 'Puede esperar', color: 'text-ae-text-muted border-ae-border bg-ae-surface-2' },
+  { value: 'secundaria', label: '🎮 Side Quest', color: 'text-purple-400 border-purple-400/40 bg-purple-400/10' },
 ]
 
 export default function QuickAddFab({ onAdd, defaultPriority = 'puede_esperar', open, onOpenChange }: QuickAddFabProps) {
