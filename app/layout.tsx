@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { DM_Sans } from "next/font/google"
 import { BottomNav } from "@/components/shared/BottomNav"
 import OnboardingWrapper from "@/components/onboarding/OnboardingWrapper"
@@ -17,6 +17,12 @@ export const metadata: Metadata = {
   description: "Captura, organiza, prioriza, enfocate y sostené hábitos desde un solo lugar.",
 }
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +33,7 @@ export default function RootLayout({
       <body className={`bg-ae-bg text-ae-text min-h-screen antialiased ${dmSans.variable}`}>
         <TimerProvider>
           <OnboardingWrapper>
-            <main className="app-main"><div className="animate-fade-in">{children}</div></main>
+            <main className="app-main page-safe-top"><div className="animate-fade-in">{children}</div></main>
             <BottomNav />
           </OnboardingWrapper>
         </TimerProvider>
