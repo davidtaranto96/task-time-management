@@ -13,15 +13,45 @@
     letter-spacing: -0.025em;
   }
 
+  /* ── Liquid Glass base ── */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.07),
+      inset 0 0 0 0.5px rgba(255,255,255,0.03),
+      0 8px 32px rgba(0,0,0,0.45),
+      0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  /* ── M3 Expressive: cards elevadas (glass) ── */
+  .card-m3 {
+    border-radius: 1.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.07),
+      0 4px 24px rgba(0,0,0,0.4),
+      0 1px 4px rgba(0,0,0,0.25);
+  }
+
   /* ── M3 Expressive: botones pill ── */
   .btn-primary {
     border-radius: 9999px;
     font-weight: 700;
     padding: 0.75rem 2rem;
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
     transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
                 background-color 150ms ease,
                 box-shadow 150ms ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.15),
+      0 2px 12px rgba(0,0,0,0.3);
   }
   .btn-primary:active {
     transform: scale(0.94);
@@ -32,19 +62,16 @@
     border-radius: 9999px;
     font-weight: 500;
     padding: 0.625rem 1.5rem;
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
     transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
                 background-color 150ms ease;
   }
   .btn-secondary:active {
     transform: scale(0.95);
-  }
-
-  /* ── M3 Expressive: cards elevadas ── */
-  .card-m3 {
-    border-radius: 1.5rem;
-    background: var(--ae-surface);
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.2);
   }
 
   /* ── M3 Expressive: spring tap para cualquier botón ── */
@@ -57,18 +84,29 @@
 }
 
 :root {
-  --ae-bg: #0a0a0b;
-  --ae-surface: #111113;
-  --ae-surface-2: #1a1a1f;
-  --ae-border: #2a2a35;
+  --ae-bg: #08080a;
+  --ae-surface: #111115;
+  --ae-surface-2: #18181e;
+  --ae-border: #252530;
   --ae-primordial: #f59e0b;
   --ae-secondary: #6b7280;
   --ae-info: #3b82f6;
   --ae-success: #10b981;
   --ae-danger: #ef4444;
   --ae-accent: #8b5cf6;
-  --ae-text: #f4f4f5;
-  --ae-text-muted: #71717a;
+  --ae-text: #f0f0f4;
+  --ae-text-muted: #6b6b78;
+
+  /* Liquid Glass tokens */
+  --glass-bg: rgba(22, 22, 28, 0.60);
+  --glass-bg-strong: rgba(14, 14, 18, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.05);
+  --glass-blur: blur(28px) saturate(160%);
+
+  /* Nav dimensions */
+  --nav-h: 64px;
+  --nav-w: 72px;
 }
 
 * {
@@ -93,14 +131,14 @@ body {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--ae-surface);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--ae-border);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--ae-secondary);
@@ -110,6 +148,111 @@ body {
 *:focus-visible {
   outline: 2px solid var(--ae-primordial);
   outline-offset: 2px;
+}
+
+/* ── Navigation: portrait (bottom) ── */
+.app-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  height: var(--nav-h);
+  border-top: 1px solid var(--glass-border);
+  background: rgba(8, 8, 12, 0.80);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  box-shadow: 0 -1px 0 rgba(255,255,255,0.04), 0 -8px 32px rgba(0,0,0,0.4);
+}
+
+.app-nav-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  height: 100%;
+  max-width: 512px;
+  margin: 0 auto;
+}
+
+.app-nav-item {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.5rem 0;
+  font-size: 0.75rem;
+  transition: color 150ms ease;
+}
+
+/* ── Main content: portrait ── */
+.app-main {
+  padding-bottom: var(--nav-h);
+  min-height: 100dvh;
+}
+
+/* ── Landscape: side navigation ── */
+@media (orientation: landscape) {
+  .app-nav {
+    top: 0;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    width: var(--nav-w);
+    height: 100dvh;
+    border-top: none;
+    border-right: 1px solid var(--glass-border);
+    box-shadow: 1px 0 0 rgba(255,255,255,0.03), 8px 0 32px rgba(0,0,0,0.4);
+  }
+
+  .app-nav-inner {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+    max-width: none;
+    width: var(--nav-w);
+    padding: 1.5rem 0;
+    gap: 0.25rem;
+  }
+
+  .app-nav-item {
+    flex: none;
+    width: 56px;
+    padding: 0.625rem 0.5rem;
+    border-radius: 0.875rem;
+    font-size: 0.65rem;
+  }
+
+  .app-nav-item:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .app-main {
+    padding-bottom: 0;
+    padding-left: var(--nav-w);
+    min-height: 100dvh;
+  }
+
+  /* Landscape: pages use 2-column grid where possible */
+  .landscape-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  /* Tighter spacing in landscape */
+  .landscape-compact .page-title {
+    font-size: 1.5rem;
+  }
+
+  .landscape-compact {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
 }
 
 @keyframes checkPop {

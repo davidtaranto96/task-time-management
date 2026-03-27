@@ -30,8 +30,8 @@ export function BottomNav() {
   const focusActive = timerStatus === 'running' || timerStatus === 'paused'
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-ae-border bg-ae-surface/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-lg items-center justify-around">
+    <nav className="app-nav">
+      <div className="app-nav-inner">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           const isEnfoque = item.href === '/enfoque'
@@ -42,7 +42,7 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               onClick={() => hapticLight()}
-              className={`relative flex flex-1 flex-col items-center gap-0.5 py-2 text-xs transition-colors ${
+              className={`app-nav-item ${
                 isActive ? 'text-ae-primordial' : 'text-ae-text-muted hover:text-ae-text'
               }`}
             >

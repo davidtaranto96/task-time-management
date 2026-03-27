@@ -93,7 +93,7 @@ export default function HabitosPage() {
         <h1 className="page-title text-ae-text">💪 Hábitos</h1>
         <button
           onClick={() => setShowForm(true)}
-          className="rounded-xl bg-ae-primordial px-4 py-2 text-sm font-semibold text-ae-bg transition-opacity hover:opacity-90"
+          className="tap-spring btn-primary text-sm"
         >
           Nuevo +
         </button>
@@ -101,7 +101,7 @@ export default function HabitosPage() {
 
       {/* Empty state */}
       {isLoaded && activeHabits.length === 0 && !showForm && (
-        <div className="rounded-2xl border border-dashed border-ae-border bg-ae-surface p-8 text-center">
+        <div className="card-m3 border border-dashed border-ae-border p-8 text-center">
           <p className="mb-1 text-4xl">🌱</p>
           <p className="mt-3 text-base font-medium text-ae-text">
             Empezá con un hábito pequeño.
@@ -111,7 +111,7 @@ export default function HabitosPage() {
           </p>
           <button
             onClick={() => setShowForm(true)}
-            className="mt-5 rounded-xl bg-ae-primordial px-5 py-2.5 font-semibold text-ae-bg transition-opacity hover:opacity-90"
+            className="tap-spring mt-5 btn-primary"
           >
             Crear mi primer hábito
           </button>
@@ -148,7 +148,7 @@ export default function HabitosPage() {
       {activeHabits.length > 0 && (
         <section className="mb-6">
           <h2 className="mb-3 font-semibold text-ae-text">Últimos 7 días</h2>
-          <div className="rounded-xl bg-ae-surface p-4">
+          <div className="card-m3 p-4">
             <WeekGrid
               habits={activeHabits}
               completions={completions}
@@ -173,7 +173,7 @@ export default function HabitosPage() {
               {archivedHabits.map((habit) => (
                 <div
                   key={habit.id}
-                  className="flex items-center gap-3 rounded-xl bg-ae-surface px-4 py-3 opacity-70"
+                  className="card-m3 flex items-center gap-3 px-4 py-3 opacity-70"
                 >
                   <span className="flex-1 text-ae-text-muted line-through min-w-0 truncate">
                     {habit.icon && <span className="mr-1">{habit.icon}</span>}
@@ -181,13 +181,13 @@ export default function HabitosPage() {
                   </span>
                   <button
                     onClick={() => restoreHabit(habit.id)}
-                    className="flex-shrink-0 rounded-lg bg-ae-surface-2 px-2.5 py-1 text-xs font-medium text-ae-text-muted hover:text-ae-text transition-colors"
+                    className="tap-spring flex-shrink-0 rounded-lg bg-ae-surface-2 px-2.5 py-1 text-xs font-medium text-ae-text-muted hover:text-ae-text transition-colors"
                   >
                     ↩ Restaurar
                   </button>
                   <button
                     onClick={() => handleDeleteHabit(habit.id)}
-                    className="flex-shrink-0 rounded-lg bg-ae-danger/10 px-2.5 py-1 text-xs font-medium text-ae-danger hover:bg-ae-danger/20 transition-colors"
+                    className="tap-spring flex-shrink-0 rounded-lg bg-ae-danger/10 px-2.5 py-1 text-xs font-medium text-ae-danger hover:bg-ae-danger/20 transition-colors"
                   >
                     🗑 Borrar
                   </button>
@@ -201,7 +201,7 @@ export default function HabitosPage() {
       {/* HabitForm modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowForm(false)}>
-          <div className="w-full max-w-lg bg-ae-surface rounded-2xl border border-ae-border shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="card-m3 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="p-5 sm:p-6">
               <h2 className="mb-5 text-lg font-bold text-ae-text">Nuevo hábito</h2>
               <HabitForm onSave={handleAddHabit} onCancel={() => setShowForm(false)} />
@@ -213,7 +213,7 @@ export default function HabitosPage() {
       {/* Edit habit modal */}
       {editingHabit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setEditingHabit(null)}>
-          <div className="w-full max-w-sm bg-ae-surface rounded-2xl border border-ae-border shadow-xl p-5 flex flex-col gap-4" onClick={(e) => e.stopPropagation()}>
+          <div className="card-m3 w-full max-w-sm p-5 flex flex-col gap-4" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-ae-text">Editar hábito</h2>
 
             <div className="flex flex-col gap-1.5">
@@ -260,7 +260,7 @@ export default function HabitosPage() {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={handleSaveEdit}
-                className="flex-1 rounded-xl bg-ae-primordial px-4 py-2.5 text-sm font-semibold text-ae-bg transition-opacity hover:opacity-90"
+                className="tap-spring flex-1 rounded-xl bg-ae-primordial px-4 py-2.5 text-sm font-semibold text-ae-bg transition-opacity hover:opacity-90"
               >
                 Guardar
               </button>
@@ -278,13 +278,13 @@ export default function HabitosPage() {
       {/* Confirm delete dialog */}
       {confirmDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm bg-ae-surface rounded-2xl border border-ae-border shadow-xl p-5 flex flex-col gap-4">
+          <div className="card-m3 w-full max-w-sm p-5 flex flex-col gap-4">
             <h2 className="text-base font-semibold text-ae-text">¿Borrar este hábito?</h2>
             <p className="text-sm text-ae-text-muted">Esta acción no se puede deshacer.</p>
             <div className="flex gap-2">
               <button
                 onClick={confirmDelete}
-                className="flex-1 rounded-xl bg-ae-danger/20 px-4 py-2.5 text-sm font-semibold text-ae-danger hover:bg-ae-danger/30 transition-colors"
+                className="tap-spring flex-1 rounded-xl bg-ae-danger/20 px-4 py-2.5 text-sm font-semibold text-ae-danger hover:bg-ae-danger/30 transition-colors"
               >
                 Sí, borrar
               </button>

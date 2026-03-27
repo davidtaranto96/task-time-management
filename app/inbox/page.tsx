@@ -182,14 +182,14 @@ export default function InboxPage() {
                   {processed.map((note) => (
                     <div
                       key={note.id}
-                      className="rounded-lg bg-ae-surface border-l-2 border-ae-border px-4 py-3 flex flex-col gap-1 opacity-60"
+                      className="card-m3 border-l-4 border-ae-border px-4 py-3 flex flex-col gap-1 opacity-60"
                     >
                       <p className="text-sm text-ae-text line-clamp-2">{note.content}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-ae-success">{processedLabel(note)}</span>
                         <button
                           onClick={() => handleDelete(note.id)}
-                          className="text-xs text-ae-text-muted hover:text-red-400 transition-colors px-1"
+                          className="tap-spring text-xs text-ae-text-muted hover:text-red-400 transition-colors px-1"
                           aria-label="Eliminar"
                         >
                           ✕

@@ -22,7 +22,7 @@ export default function PriorityCard({ task, onComplete, onDefer, onDelete, inde
 
   return (
     <div
-      className={`bg-ae-surface rounded-xl p-4 border border-ae-border transition-all duration-150 transition-opacity ${
+      className={`card-m3 p-4 transition-all duration-150 ${
         isDone ? 'opacity-50' : 'opacity-100'
       } ${className ?? ''}`}
     >
@@ -78,7 +78,7 @@ export default function PriorityCard({ task, onComplete, onDefer, onDelete, inde
       </div>
 
       {/* Action buttons */}
-      <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-ae-border">
+      <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-white/[0.06]">
         <button
           onClick={onComplete}
           disabled={isDone}

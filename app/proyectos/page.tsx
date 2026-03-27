@@ -118,7 +118,7 @@ export default function ProyectosPage() {
       {/* Modal overlay for form */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowForm(false)}>
-          <div className="w-full max-w-md bg-ae-surface rounded-2xl border border-ae-border shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="card-m3 w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <h2 className="text-lg font-bold text-ae-text mb-4">Nuevo proyecto</h2>
               <ProjectForm onSave={handleCreateProject} onCancel={() => setShowForm(false)} />
@@ -130,7 +130,7 @@ export default function ProyectosPage() {
       {/* Modal overlay for detail */}
       {selectedProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setSelectedProject(null)}>
-          <div className="w-full max-w-lg bg-ae-surface rounded-2xl border border-ae-border shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="card-m3 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <ProjectDetail
                 project={selectedProject}
@@ -153,7 +153,7 @@ export default function ProyectosPage() {
         <h1 className="page-title text-ae-text">📂 Proyectos</h1>
         <button
           onClick={() => setShowForm(true)}
-          className="px-4 py-2 bg-ae-primordial text-ae-bg font-semibold rounded-lg text-sm hover:opacity-90 transition-opacity"
+          className="tap-spring btn-primary text-sm"
         >
           Nuevo +
         </button>
@@ -167,7 +167,7 @@ export default function ProyectosPage() {
           </p>
           <button
             onClick={() => setShowForm(true)}
-            className="px-5 py-2.5 bg-ae-primordial text-ae-bg font-semibold rounded-lg text-sm hover:opacity-90 transition-opacity"
+            className="tap-spring btn-primary text-sm"
           >
             Crear proyecto
           </button>
@@ -250,7 +250,7 @@ export default function ProyectosPage() {
                     />
                     <button
                       onClick={(e) => { e.stopPropagation(); reopenProject(project.id) }}
-                      className="absolute top-2 right-2 px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 font-medium rounded-md hover:bg-amber-500/30 transition-colors"
+                      className="tap-spring absolute top-2 right-2 px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 font-medium rounded-md hover:bg-amber-500/30 transition-colors"
                     >
                       Reabrir
                     </button>
@@ -285,7 +285,7 @@ export default function ProyectosPage() {
                     />
                     <button
                       onClick={(e) => { e.stopPropagation(); unarchiveProject(project.id) }}
-                      className="absolute top-2 right-2 px-2 py-0.5 text-xs bg-ae-surface-2 text-ae-text-muted font-medium rounded-md hover:text-ae-text border border-ae-border transition-colors"
+                      className="tap-spring absolute top-2 right-2 px-2 py-0.5 text-xs bg-ae-surface-2 text-ae-text-muted font-medium rounded-md hover:text-ae-text border border-ae-border transition-colors"
                     >
                       Desarchivar
                     </button>

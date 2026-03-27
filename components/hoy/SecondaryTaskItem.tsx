@@ -44,7 +44,7 @@ export default function SecondaryTaskItem({ task, onComplete, onDefer, onPromote
 
   return (
     <>
-      <div className="group flex items-center gap-3 bg-ae-surface-2 rounded-lg px-3 py-2 border border-transparent hover:border-ae-border transition-all duration-150">
+      <div className="group flex items-center gap-3 rounded-xl px-3 py-2 border border-transparent hover:border-white/[0.08] hover:bg-white/[0.04] transition-all duration-150" style={{backdropFilter:'blur(16px)'}}>
         {/* Checkbox */}
         <button
           onClick={onComplete}
@@ -121,7 +121,8 @@ export default function SecondaryTaskItem({ task, onComplete, onDefer, onPromote
       {editing && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-end justify-center" onClick={() => setEditing(false)}>
           <div
-            className="w-full max-w-md bg-ae-surface rounded-t-2xl border border-ae-border p-5 flex flex-col gap-4"
+            className="w-full max-w-md rounded-t-2xl border border-white/[0.08] p-5 flex flex-col gap-4"
+            style={{background:'rgba(14,14,18,0.85)',backdropFilter:'blur(32px) saturate(180%)',WebkitBackdropFilter:'blur(32px) saturate(180%)'}}
             onClick={e => e.stopPropagation()}
           >
             <h3 className="font-semibold text-ae-text">Editar tarea</h3>

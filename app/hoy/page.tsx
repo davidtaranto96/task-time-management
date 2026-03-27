@@ -245,7 +245,7 @@ export default function HoyPage() {
 
         {primordialTasks.length === 0 && donePrimordial.length === 0 ? (
           /* A4: plain informational text + proper CTA button */
-          <div className="bg-ae-surface rounded-xl p-6 border border-ae-border border-dashed text-center space-y-3">
+          <div className="card-m3 p-6 border border-dashed border-ae-border text-center space-y-3">
             <p className="text-ae-text-muted text-sm">Sin prioridades aún. Elegí hasta 3 tareas primordiales para hoy.</p>
           </div>
         ) : (
@@ -279,7 +279,7 @@ export default function HoyPage() {
         {primordialTasks.length + donePrimordial.length < 3 && (
           <button
             onClick={() => openAddSheet('primordial')}
-            className="w-full text-sm text-ae-primordial/70 hover:text-ae-primordial border border-dashed border-ae-primordial/30 hover:border-ae-primordial/60 rounded-xl py-3 transition-colors"
+            className="tap-spring w-full text-sm text-ae-primordial/70 hover:text-ae-primordial border border-dashed border-ae-primordial/30 hover:border-ae-primordial/60 rounded-xl py-3 transition-colors"
           >
             + {primordialTasks.length + donePrimordial.length === 0 ? 'Agregar primera prioridad' : 'Agregar prioridad'}
           </button>
@@ -375,7 +375,7 @@ export default function HoyPage() {
               {completedTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center justify-between gap-3 rounded-xl bg-ae-surface px-4 py-3 opacity-60"
+                  className="card-m3 flex items-center justify-between gap-3 px-4 py-3 opacity-60"
                 >
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <span className="truncate text-sm font-medium text-ae-text line-through">
@@ -389,7 +389,7 @@ export default function HoyPage() {
                   </div>
                   <button
                     onClick={() => uncompleteTask(task.id)}
-                    className="shrink-0 rounded-lg bg-ae-surface-2 px-3 py-1.5 text-xs font-medium text-ae-text-muted hover:text-ae-text hover:bg-ae-border transition-colors"
+                    className="tap-spring shrink-0 rounded-lg bg-ae-surface-2 px-3 py-1.5 text-xs font-medium text-ae-text-muted hover:text-ae-text hover:bg-ae-border transition-colors"
                   >
                     Desmarcar
                   </button>
@@ -411,12 +411,12 @@ export default function HoyPage() {
 
       {/* C3: Daily review CTA — show if all primordials done OR hour >= 18 */}
       {((donePrimordial.length === primordialTasks.length + donePrimordial.length && primordialTasks.length + donePrimordial.length > 0) || new Date().getHours() >= 18) ? (
-        <div className="mx-4 mb-6 p-4 rounded-xl border border-ae-surface bg-ae-surface/50 flex items-center justify-between">
+        <div className="card-m3 mx-4 mb-6 p-4 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-ae-text">¿Terminaste el día?</p>
             <p className="text-xs text-ae-muted">Hacé tu revisión diaria</p>
           </div>
-          <a href="/revision" className="px-3 py-1.5 rounded-lg bg-ae-primordial/20 text-ae-primordial text-sm font-medium">
+          <a href="/revision" className="tap-spring px-3 py-1.5 rounded-lg bg-ae-primordial/20 text-ae-primordial text-sm font-medium">
             Revisar →
           </a>
         </div>

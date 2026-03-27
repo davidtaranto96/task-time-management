@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={`bg-ae-bg text-ae-text min-h-screen antialiased ${dmSans.variable}`}>
         <TimerProvider>
           <OnboardingWrapper>
-            <main className="pb-20"><div className="animate-fade-in">{children}</div></main>
+            <main className="app-main"><div className="animate-fade-in">{children}</div></main>
             <BottomNav />
           </OnboardingWrapper>
         </TimerProvider>
