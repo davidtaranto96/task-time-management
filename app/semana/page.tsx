@@ -126,8 +126,9 @@ export default function SemanaPage() {
   }, [selectedDayId])
 
   // Merge today tasks into weekTasks for current week display
+  // weekTasks must override todayTasks so DayDetail mutations (complete/delete) are reflected immediately
   const mergedTasks = weekOffset === 0
-    ? { ...weekTasks, ...todayTasks }
+    ? { ...todayTasks, ...weekTasks }
     : weekTasks
 
   const selectedDayTasks = selectedDayId

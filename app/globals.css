@@ -150,6 +150,17 @@ body {
   outline-offset: 2px;
 }
 
+/* ── Enfoque page container ── */
+.enfoque-page {
+  height: calc(100dvh - var(--nav-h));
+}
+
+/* ── Nav active item pill (portrait & landscape) ── */
+.app-nav-item.nav-active {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 0.875rem;
+}
+
 /* ── Navigation: portrait (bottom) ── */
 .app-nav {
   position: fixed;
@@ -235,6 +246,27 @@ body {
     padding-left: var(--nav-w);
     min-height: 100dvh;
   }
+
+  /* Enfoque: no bottom nav in landscape */
+  .enfoque-page {
+    height: 100dvh;
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 0.75rem 1.5rem;
+    align-items: start;
+    padding: 1rem 1.5rem;
+  }
+
+  /* Header spans full width */
+  .enfoque-page > header { grid-column: 1 / -1; }
+  /* Timer in center left column, rows 2 */
+  .enfoque-page > .enfoque-timer { grid-column: 1; grid-row: 2; display: flex; align-items: center; justify-content: center; height: 100%; }
+  /* Controls in right column */
+  .enfoque-page > .enfoque-controls { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; gap: 0.75rem; justify-content: center; }
+  /* Task selector full width */
+  .enfoque-page > .enfoque-task { grid-column: 1 / -1; grid-row: 1; }
 
   /* Landscape: pages use 2-column grid where possible */
   .landscape-grid {

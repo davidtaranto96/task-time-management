@@ -132,10 +132,7 @@ export default function EnfoquePage() {
   const isActive = running || paused
 
   return (
-    <div
-      className="mx-auto max-w-lg px-4 py-3 flex flex-col gap-3 overflow-hidden"
-      style={{ height: 'calc(100dvh - 80px)' }}
-    >
+    <div className="enfoque-page mx-auto max-w-lg px-4 py-3 flex flex-col gap-3 overflow-hidden">
       {/* ── Header ── */}
       <header className="flex items-center justify-between flex-shrink-0">
         <div>
@@ -151,9 +148,9 @@ export default function EnfoquePage() {
         </span>
       </header>
 
-      {/* ── Task selector (compact) ── */}
+      {/* ── Task selector ── */}
       {isLoaded && (
-        <div className="flex-shrink-0">
+        <div className="enfoque-task flex-shrink-0">
           <TaskSelector
             tasks={taskList}
             selectedTaskId={selectedTaskId}
@@ -165,8 +162,8 @@ export default function EnfoquePage() {
         </div>
       )}
 
-      {/* ── Timer — flex-1 so it fills available space, centered ── */}
-      <div className="flex-1 flex flex-col items-center justify-center min-h-0">
+      {/* ── Timer ── */}
+      <div className="enfoque-timer flex-1 flex flex-col items-center justify-center min-h-0">
         <FocusTimer
           remainingSeconds={timer.remainingSeconds}
           totalSeconds={timer.totalSeconds}
@@ -187,7 +184,7 @@ export default function EnfoquePage() {
           </p>
         )}
 
-        {/* Subtask checklist inline (compact) */}
+        {/* Subtask checklist */}
         {selectedTask?.subtaskIds && selectedTask.subtaskIds.length > 0 && (
           <div className="mt-3 w-full max-w-xs rounded-xl border border-ae-border bg-ae-surface p-3">
             <SubtaskChecklist subtaskIds={selectedTask.subtaskIds} onToggle={() => {}} />
@@ -195,8 +192,8 @@ export default function EnfoquePage() {
         )}
       </div>
 
-      {/* ── Bottom controls ── */}
-      <div className="flex-shrink-0 flex flex-col gap-2 pb-1">
+      {/* ── Controls ── */}
+      <div className="enfoque-controls flex-shrink-0 flex flex-col gap-2 pb-1">
         {completedMessage && !timer.breakMode ? (
           /* Completed state */
           <div className="flex flex-col items-center gap-3">

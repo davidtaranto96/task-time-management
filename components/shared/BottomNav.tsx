@@ -43,7 +43,7 @@ export function BottomNav() {
               href={item.href}
               onClick={() => hapticLight()}
               className={`app-nav-item ${
-                isActive ? 'text-ae-primordial' : 'text-ae-text-muted hover:text-ae-text'
+                isActive ? 'text-ae-primordial nav-active' : 'text-ae-text-muted hover:text-ae-text'
               }`}
             >
               {/* Focus active badge */}
