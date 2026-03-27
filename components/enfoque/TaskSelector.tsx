@@ -1,74 +1,106 @@
 "use client"
 
-import Link from 'next/link'
+import { useState } from 'react'
 import type { Task } from '@/types/task'
 
 interface TaskSelectorProps {
   tasks: Task[]
   selectedTaskId: string | null
-  onSelect: (taskId: string) => void
+  onSelect: (id: string | null) => void
+  disabled?: boolean
 }
 
-export function TaskSelector({ tasks, selectedTaskId, onSelect }: TaskSelectorProps) {
+export function TaskSelector({ tasks, selectedTaskId, onSelect, disabled }: TaskSelectorProps) {
+  const [open, setOpen] = useState(false)
+
   const activeTasks = tasks.filter(
     (t) => t.status !== 'done' && t.status !== 'deleted' && t.status !== 'deferred'
   )
 
   // Primordial tasks first
   const sorted = [...activeTasks].sort((a, b) => {
-    const aPrim = a.priority === 'primordial' ? 0 : 1
-    const bPrim = b.priority === 'primordial' ? 0 : 1
-    return aPrim - bPrim
+    const order = { primordial: 0, importante: 1, puede_esperar: 2 }
+    return (order[a.priority as keyof typeof order] ?? 2) - (order[b.priority as keyof typeof order] ?? 2)
   })
 
-  if (sorted.length === 0) {
-    return (
-      <div className="rounded-xl border border-ae-border bg-ae-surface p-4 text-center">
-        <p className="text-sm text-ae-text-muted">No hay tareas para hoy.</p>
-        <Link
-          href="/hoy"
-          className="mt-2 inline-block text-sm text-amber-400 hover:text-amber-300"
-        >
-          Agregá una desde Hoy →
-        </Link>
-      </div>
-    )
+  const selectedTask = selectedTaskId ? tasks.find((t) => t.id === selectedTaskId) : null
+
+  const handleSelect = (id: string | null) => {
+    onSelect(id)
+    setOpen(false)
   }
 
   return (
-    <div className="flex flex-col gap-1.5 rounded-xl border border-ae-border bg-ae-surface p-2">
-      {sorted.map((task) => {
-        const isPrimordial = task.priority === 'primordial'
-        const isSelected = task.id === selectedTaskId
-        return (
+    <div className="relative">
+      {/* Trigger button */}
+      <button
+        onClick={() => { if (!disabled) setOpen((v) => !v) }}
+        disabled={disabled}
+        className={[
+          'w-full flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors',
+          disabled
+            ? 'border-ae-border bg-ae-surface opacity-60 cursor-not-allowed'
+            : open
+            ? 'border-amber-500/50 bg-ae-surface'
+            : 'border-ae-border bg-ae-surface hover:border-ae-text-muted',
+        ].join(' ')}
+      >
+        {/* Status dot */}
+        <span
+          className={[
+            'flex-shrink-0 w-2 h-2 rounded-full',
+            selectedTask
+              ? selectedTask.priority === 'primordial' ? 'bg-amber-400' : 'bg-blue-400'
+              : 'bg-green-400',
+          ].join(' ')}
+        />
+        <span className="flex-1 truncate text-sm text-ae-text">
+          {selectedTask ? selectedTask.title : '⚡ Sesión libre'}
+        </span>
+        <span className="flex-shrink-0 text-xs text-ae-text-muted">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Dropdown list */}
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-ae-border bg-ae-surface shadow-xl overflow-hidden">
+          {/* Free session option */}
           <button
-            key={task.id}
-            onClick={() => onSelect(task.id)}
+            onClick={() => handleSelect(null)}
             className={[
-              'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-colors',
-              isSelected
-                ? 'bg-ae-surface-2 ring-1 ring-amber-500/50'
-                : 'hover:bg-ae-surface-2',
+              'w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-ae-surface-2',
+              !selectedTaskId ? 'bg-ae-surface-2' : '',
             ].join(' ')}
           >
-            {/* Priority dot */}
-            <span
-              className={[
-                'mt-0.5 h-2 w-2 flex-shrink-0 rounded-full',
-                isPrimordial ? 'bg-amber-400' : 'bg-ae-text-muted',
-              ].join(' ')}
-            />
-            <span
-              className={[
-                'truncate text-sm',
-                isSelected ? 'font-medium text-ae-text' : 'text-ae-text-muted',
-              ].join(' ')}
-            >
-              {task.title}
-            </span>
+            <span className="flex-shrink-0 w-2 h-2 rounded-full bg-green-400" />
+            <span className="text-sm text-ae-text">⚡ Sesión libre</span>
           </button>
-        )
-      })}
+
+          {/* Task list */}
+          {sorted.map((task) => {
+            const isSelected = task.id === selectedTaskId
+            return (
+              <button
+                key={task.id}
+                onClick={() => handleSelect(task.id)}
+                className={[
+                  'w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-ae-surface-2',
+                  isSelected ? 'bg-ae-surface-2' : '',
+                ].join(' ')}
+              >
+                <span
+                  className={[
+                    'flex-shrink-0 w-2 h-2 rounded-full',
+                    task.priority === 'primordial' ? 'bg-amber-400' : 'bg-ae-text-muted',
+                  ].join(' ')}
+                />
+                <span className={['truncate text-sm', isSelected ? 'font-medium text-ae-text' : 'text-ae-text-muted'].join(' ')}>
+                  {task.title}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

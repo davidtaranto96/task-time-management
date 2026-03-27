@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import type { Habit } from '@/types/habit'
+import { hapticLight } from '@/lib/haptics'
 
 interface HabitRowProps {
   habits: Habit[]
@@ -36,19 +37,19 @@ export default function HabitRow({ habits, todayId, isCompleted, onToggle, getSt
         return (
           <button
             key={habit.id}
-            onClick={() => onToggle(habit.id)}
-            className="flex-shrink-0 flex flex-col items-center gap-1.5 w-16"
+            onClick={() => { hapticLight(); onToggle(habit.id) }}
+            className="flex-shrink-0 flex flex-col items-center gap-1.5 w-20"
           >
             {/* Circle */}
             <div
-              className={`relative w-11 h-11 rounded-full flex items-center justify-center text-lg transition-all ${
+              className={`relative w-12 h-12 rounded-full flex items-center justify-center text-lg transition-all ${
                 done
                   ? 'ring-2 ring-ae-success ring-offset-2 ring-offset-ae-bg bg-ae-success/10'
                   : 'ring-2 ring-ae-border bg-ae-surface-2 hover:ring-ae-primordial/50'
               }`}
             >
               {habit.icon ? (
-                <span className="text-base leading-none">{habit.icon}</span>
+                <span className="text-xl leading-none">{habit.icon}</span>
               ) : (
                 <span className="text-sm font-bold text-ae-text">{initial}</span>
               )}
@@ -60,7 +61,7 @@ export default function HabitRow({ habits, todayId, isCompleted, onToggle, getSt
             </div>
 
             {/* Title */}
-            <span className="text-xs text-ae-text-muted text-center w-full truncate leading-tight">
+            <span className="text-xs text-ae-text-muted text-center w-full line-clamp-2 break-words leading-tight">
               {habit.title}
             </span>
 

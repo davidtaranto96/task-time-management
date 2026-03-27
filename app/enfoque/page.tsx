@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
 import { useTaskStore } from '@/store/taskStore'
 import { useTimerStore } from '@/store/timerStore'
 import { useSettingsStore } from '@/store/settingsStore'
@@ -10,6 +9,7 @@ import { TimerModeSelector } from '@/components/enfoque/TimerModeSelector'
 import { TaskSelector } from '@/components/enfoque/TaskSelector'
 import { SubtaskChecklist } from '@/components/enfoque/SubtaskChecklist'
 import type { TimerMode } from '@/types/timer'
+import { hapticSuccess, hapticMedium, hapticHeavy } from '@/lib/haptics'
 
 function playCompletionSound() {
   const AudioCtx = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
@@ -34,6 +34,7 @@ export default function EnfoquePage() {
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [completedMessage, setCompletedMessage] = useState(false)
+  const [showTaskDoneDialog, setShowTaskDoneDialog] = useState(false)
 
   // Load today's tasks on mount and set preferred timer mode
   useEffect(() => {
@@ -59,6 +60,14 @@ export default function EnfoquePage() {
     if (timer.status === 'completed' && !timer.isBreak) {
       setCompletedMessage(true)
       playCompletionSound()
+      hapticHeavy()
+    }
+    if (timer.status === 'running' && timer.isBreak) {
+      hapticMedium()
+    }
+    if (timer.status === 'idle' && timer.isBreak === false && timer.sessionsCompleted > 0) {
+      // break ended
+      hapticHeavy()
     }
     if (timer.status === 'idle' || timer.status === 'running') {
       setCompletedMessage(false)
@@ -74,19 +83,43 @@ export default function EnfoquePage() {
   )
 
   const handleStart = () => {
-    if (!selectedTaskId) return
     setCompletedMessage(false)
     startTimer(selectedTaskId, timer.mode)
   }
 
   const handleStop = () => {
+    if (selectedTaskId && isActive) {
+      setShowTaskDoneDialog(true)
+    } else {
+      stopTimer()
+      setCompletedMessage(false)
+    }
+  }
+
+  const handleTaskDoneAnswer = async (done: boolean) => {
+    if (done && selectedTaskId) {
+      await completeTask(selectedTaskId)
+      hapticSuccess()
+      // Auto-select next task
+      const taskList = Object.values(tasks)
+      const next = taskList.find(
+        (t) =>
+          t.id !== selectedTaskId &&
+          t.status !== 'done' &&
+          t.status !== 'deleted' &&
+          t.status !== 'deferred'
+      )
+      setSelectedTaskId(next?.id ?? null)
+    }
     stopTimer()
     setCompletedMessage(false)
+    setShowTaskDoneDialog(false)
   }
 
   const handleMarkDone = async () => {
     if (!selectedTaskId) return
     await completeTask(selectedTaskId)
+    hapticSuccess()
 
     // Auto-select next task
     const taskList = Object.values(tasks)
@@ -127,21 +160,15 @@ export default function EnfoquePage() {
         </span>
       </div>
 
-      {/* No task selected empty state */}
+      {/* No task selected empty state — soft message, no redirect block */}
       {!selectedTaskId && isLoaded && (
-        <div className="mb-6 rounded-xl border border-ae-border bg-ae-surface p-6 text-center">
-          <p className="text-ae-text-muted">Elegí una tarea para empezar a enfocarte</p>
-          <Link
-            href="/hoy"
-            className="mt-3 inline-block text-sm text-amber-400 hover:text-amber-300"
-          >
-            Ir a Hoy →
-          </Link>
+        <div className="mb-6 rounded-xl border border-ae-border bg-ae-surface p-4 text-center">
+          <p className="text-sm text-ae-text-muted">Sin tarea seleccionada — modo libre</p>
         </div>
       )}
 
       {/* Task selector */}
-      {isLoaded && taskList.length > 0 && (
+      {isLoaded && (
         <div className="mb-6">
           <p className="mb-2 text-xs font-medium uppercase tracking-wider text-ae-text-muted">
             Tarea
@@ -155,6 +182,7 @@ export default function EnfoquePage() {
                 setCompletedMessage(false)
               }
             }}
+            disabled={isActive}
           />
         </div>
       )}
@@ -202,18 +230,20 @@ export default function EnfoquePage() {
           <p className="text-center text-lg font-semibold text-green-400">
             ¡Sesión completada!
           </p>
-          <div className="flex gap-3">
-            <button
-              onClick={handleMarkDone}
-              className="rounded-xl bg-green-500 px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-green-400"
-            >
-              Marcar tarea como hecha ✓
-            </button>
+          <div className="flex flex-wrap justify-center gap-3">
+            {selectedTaskId && (
+              <button
+                onClick={handleMarkDone}
+                className="rounded-xl bg-green-500 px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-green-400"
+              >
+                ✅ Sí, la completé
+              </button>
+            )}
             <button
               onClick={handleAnotherSession}
               className="rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-amber-400"
             >
-              Otra sesión
+              {selectedTaskId ? '⏭ No, seguir pendiente' : 'Otra sesión'}
             </button>
           </div>
         </div>
@@ -236,8 +266,7 @@ export default function EnfoquePage() {
               <p className="text-sm text-ae-text-muted">¿Listo para otra sesión?</p>
               <button
                 onClick={handleStart}
-                disabled={!selectedTaskId}
-                className="rounded-xl bg-amber-500 px-8 py-3 text-base font-semibold text-black transition-colors hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40 animate-bounce-subtle"
+                className="rounded-xl bg-amber-500 px-8 py-3 text-base font-semibold text-black transition-colors hover:bg-amber-400 animate-bounce-subtle"
               >
                 Empezar otra sesión
               </button>
@@ -250,8 +279,7 @@ export default function EnfoquePage() {
               {!isActive ? (
                 <button
                   onClick={handleStart}
-                  disabled={!selectedTaskId}
-                  className="rounded-xl bg-amber-500 px-8 py-3 text-base font-semibold text-black transition-colors hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-xl bg-amber-500 px-8 py-3 text-base font-semibold text-black transition-colors hover:bg-amber-400"
                 >
                   {timer.status === 'idle' && timer.sessionsCompleted > 0 ? 'Empezar' : 'Iniciar'}
                 </button>
@@ -305,6 +333,30 @@ export default function EnfoquePage() {
             subtaskIds={selectedTask.subtaskIds}
             onToggle={() => {}}
           />
+        </div>
+      )}
+
+      {/* Task done dialog */}
+      {showTaskDoneDialog && selectedTaskId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-sm bg-ae-surface rounded-2xl border border-ae-border shadow-xl p-5 flex flex-col gap-4">
+            <h2 className="text-base font-semibold text-ae-text">¿Esta tarea se realizó?</h2>
+            <p className="text-sm text-ae-text-muted truncate">{selectedTask?.title}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleTaskDoneAnswer(true)}
+                className="flex-1 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-green-400"
+              >
+                ✅ Sí, la completé
+              </button>
+              <button
+                onClick={() => handleTaskDoneAnswer(false)}
+                className="flex-1 rounded-xl bg-ae-surface-2 px-4 py-2.5 text-sm font-medium text-ae-text-muted transition-colors hover:text-ae-text"
+              >
+                No, seguir
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

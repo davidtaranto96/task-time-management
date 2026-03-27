@@ -6,7 +6,7 @@ import { sendTimerCompleteNotification } from '@/lib/notifications'
 interface TimerStoreState {
   timer: TimerState
 
-  startTimer: (taskId: string, mode: TimerMode) => void
+  startTimer: (taskId: string | null, mode: TimerMode) => void
   pauseTimer: () => void
   resumeTimer: () => void
   stopTimer: () => void
@@ -41,7 +41,7 @@ const initialTimer: TimerState = {
 export const useTimerStore = create<TimerStoreState>()((set, get) => ({
   timer: initialTimer,
 
-  startTimer: (taskId, mode) => {
+  startTimer: (taskId: string | null, mode) => {
     const duration = TIMER_DURATIONS[mode]
     set({
       timer: {

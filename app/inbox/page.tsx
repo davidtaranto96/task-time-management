@@ -13,7 +13,7 @@ import type { TaskPriority } from "@/types"
 import type { AreaKey } from "@/types/area"
 
 export default function InboxPage() {
-  const { loadNotes, addNote, processNote, deleteNote, getUnprocessed, getProcessed, isLoaded } =
+  const { loadNotes, addNote, processNote, updateNote, deleteNote, getUnprocessed, getProcessed, isLoaded } =
     useInboxStore()
   const { addTask } = useTaskStore()
   const { addProject } = useProjectStore()
@@ -62,7 +62,7 @@ export default function InboxPage() {
   }
 
   const handleSaveAsNote = async (noteId: string) => {
-    await processNote(noteId, { type: "note", targetId: noteId })
+    await updateNote(noteId, { type: "nota" })
     setSelectedNote(null)
   }
 

@@ -11,9 +11,11 @@ interface HabitItemProps {
   streak: number
   onToggle: () => void
   onArchive: () => void
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
-export default function HabitItem({ habit, isCompleted, streak, onToggle, onArchive }: HabitItemProps) {
+export default function HabitItem({ habit, isCompleted, streak, onToggle, onArchive, onEdit, onDelete }: HabitItemProps) {
   const [showArchive, setShowArchive] = useState(false)
   const area = habit.area ? AREAS[habit.area] : null
 
@@ -75,16 +77,31 @@ export default function HabitItem({ habit, isCompleted, streak, onToggle, onArch
         </div>
       )}
 
-      {/* Archive overlay */}
+      {/* Actions overlay */}
       {showArchive && (
         <div className="absolute inset-0 flex items-center justify-end gap-2 rounded-xl bg-ae-bg/90 px-4">
-          <span className="text-sm text-ae-text-muted">¿Archivar?</span>
+          {onEdit && (
+            <button
+              onClick={() => { onEdit(); setShowArchive(false) }}
+              className="rounded-lg bg-amber-500/20 px-3 py-1.5 text-sm font-medium text-amber-400 hover:bg-amber-500/30"
+            >
+              Editar
+            </button>
+          )}
           <button
             onClick={() => { onArchive(); setShowArchive(false) }}
-            className="rounded-lg bg-ae-danger/20 px-3 py-1.5 text-sm font-medium text-ae-danger hover:bg-ae-danger/30"
+            className="rounded-lg bg-ae-surface-2 px-3 py-1.5 text-sm font-medium text-ae-text-muted hover:text-ae-text"
           >
             Archivar
           </button>
+          {onDelete && (
+            <button
+              onClick={() => { onDelete(); setShowArchive(false) }}
+              className="rounded-lg bg-ae-danger/20 px-3 py-1.5 text-sm font-medium text-ae-danger hover:bg-ae-danger/30"
+            >
+              Borrar
+            </button>
+          )}
           <button
             onClick={() => setShowArchive(false)}
             className="rounded-lg bg-ae-surface-2 px-3 py-1.5 text-sm font-medium text-ae-text-muted hover:text-ae-text"

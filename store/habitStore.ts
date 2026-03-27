@@ -14,6 +14,8 @@ interface HabitStoreState {
   addHabit: (partial: Partial<Habit> & { title: string }) => Promise<Habit>
   updateHabit: (id: string, updates: Partial<Habit>) => Promise<void>
   archiveHabit: (id: string) => Promise<void>
+  deleteHabit: (id: string) => Promise<void>
+  restoreHabit: (id: string) => Promise<void>
   toggleCompletion: (habitId: string, dayId: string) => Promise<void>
 
   getActiveHabits: () => Habit[]
@@ -86,6 +88,25 @@ export const useHabitStore = create<HabitStoreState>()(
         const existing = getState().habits[id]
         if (!existing) return
         const updated = { ...existing, isArchived: true }
+        await idbSet(`ae:habit:${id}`, updated)
+        setState((s) => ({
+          habits: { ...s.habits, [id]: updated },
+        }))
+      },
+
+      deleteHabit: async (id) => {
+        await idbDel(`ae:habit:${id}`)
+        setState((s) => {
+          const habits = { ...s.habits }
+          delete habits[id]
+          return { habits }
+        })
+      },
+
+      restoreHabit: async (id) => {
+        const existing = getState().habits[id]
+        if (!existing) return
+        const updated = { ...existing, isArchived: false }
         await idbSet(`ae:habit:${id}`, updated)
         setState((s) => ({
           habits: { ...s.habits, [id]: updated },

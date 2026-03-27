@@ -30,14 +30,32 @@ export default function SecondaryTaskItem({ task, onComplete, onDefer, onPromote
         {isDone && <span className="text-xs">✓</span>}
       </button>
 
-      {/* Title */}
+      {/* Priority dot */}
       <span
-        className={`flex-1 text-sm min-w-0 truncate ${
-          isDone ? 'line-through text-ae-text-muted' : 'text-ae-text'
+        className={`flex-shrink-0 w-2 h-2 rounded-full ${
+          task.priority === 'primordial'
+            ? 'bg-amber-400'
+            : task.priority === 'importante'
+            ? 'bg-blue-400'
+            : 'bg-ae-text-muted'
         }`}
-      >
-        {task.title}
-      </span>
+      />
+
+      {/* Title + date */}
+      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+        <span
+          className={`text-sm truncate ${
+            isDone ? 'line-through text-ae-text-muted' : 'text-ae-text'
+          }`}
+        >
+          {task.title}
+        </span>
+        {task.scheduledDate && (
+          <span className="text-xs text-ae-text-muted">
+            {new Date(task.scheduledDate + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
+          </span>
+        )}
+      </div>
 
       {/* Area badge */}
       {area && (
