@@ -117,9 +117,9 @@ export default function ProyectosPage() {
     <div className="mx-auto max-w-2xl px-4 py-6">
       {/* Modal overlay for form */}
       {showForm && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 p-4" onClick={() => setShowForm(false)}>
-          <div className="flex min-h-full items-start justify-center pt-8 pb-4">
-            <div className="w-full max-w-md bg-ae-surface rounded-2xl p-6 border border-ae-border shadow-xl " onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowForm(false)}>
+          <div className="w-full max-w-md bg-ae-surface rounded-2xl border border-ae-border shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
               <h2 className="text-lg font-bold text-ae-text mb-4">Nuevo proyecto</h2>
               <ProjectForm onSave={handleCreateProject} onCancel={() => setShowForm(false)} />
             </div>
@@ -129,9 +129,9 @@ export default function ProyectosPage() {
 
       {/* Modal overlay for detail */}
       {selectedProject && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 p-4" onClick={() => setSelectedProject(null)}>
-          <div className="flex min-h-full items-start justify-center pt-8 pb-4">
-            <div className="w-full max-w-lg bg-ae-surface rounded-2xl p-6 border border-ae-border shadow-xl " onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setSelectedProject(null)}>
+          <div className="w-full max-w-lg bg-ae-surface rounded-2xl border border-ae-border shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
               <ProjectDetail
                 project={selectedProject}
                 tasks={getProjectTasks(selectedProject)}
