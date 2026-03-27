@@ -85,7 +85,7 @@ export default function InboxPage() {
       {/* Header */}
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-ae-text">📥 Inbox</h1>
+          <h1 className="page-title text-ae-text">📥 Inbox</h1>
           {sinProcesar.length > 0 && (
             <span className="inline-flex items-center justify-center rounded-full bg-ae-primordial/20 px-2.5 py-0.5 text-xs font-bold text-ae-primordial">
               {sinProcesar.length}

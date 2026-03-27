@@ -27,7 +27,7 @@ export default function WeekHeader({ weekId, onPrevWeek, onNextWeek }: WeekHeade
 
         <div className="flex flex-col items-center gap-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-ae-text">Semana {weekNum}</h1>
+            <h1 className="page-title text-ae-text">Semana {weekNum}</h1>
             {isCurrentWeek && (
               <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-ae-primordial/20 text-ae-primordial border border-ae-primordial/30">
                 Esta semana

@@ -150,7 +150,7 @@ export default function ProyectosPage() {
 
       {/* Page header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-ae-text">📂 Proyectos</h1>
+        <h1 className="page-title text-ae-text">📂 Proyectos</h1>
         <button
           onClick={() => setShowForm(true)}
           className="px-4 py-2 bg-ae-primordial text-ae-bg font-semibold rounded-lg text-sm hover:opacity-90 transition-opacity"

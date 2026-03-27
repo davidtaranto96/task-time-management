@@ -60,7 +60,7 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-2xl px-4 py-6 space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-ae-text">Dashboard</h1>
+        <h1 className="page-title text-ae-text">Dashboard</h1>
         <p className="text-ae-text-muted text-sm capitalize">{dateLabel}</p>
       </div>
 

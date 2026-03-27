@@ -90,7 +90,7 @@ export default function HabitosPage() {
     <div className="mx-auto max-w-2xl px-4 py-6">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-ae-text">💪 Hábitos</h1>
+        <h1 className="page-title text-ae-text">💪 Hábitos</h1>
         <button
           onClick={() => setShowForm(true)}
           className="rounded-xl bg-ae-primordial px-4 py-2 text-sm font-semibold text-ae-bg transition-opacity hover:opacity-90"

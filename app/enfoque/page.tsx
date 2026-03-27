@@ -139,7 +139,7 @@ export default function EnfoquePage() {
       {/* ── Header ── */}
       <header className="flex items-center justify-between flex-shrink-0">
         <div>
-          <h1 className="text-xl font-bold text-ae-text">
+          <h1 className="page-title text-ae-text">
             {timer.isBreak ? '🌿 Descanso' : '🎯 Enfoque'}
           </h1>
           <p className="text-xs text-ae-text-muted leading-none mt-0.5">

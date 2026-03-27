@@ -215,7 +215,7 @@ export default function HoyPage() {
 
       {/* 1. Header */}
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-ae-text">{dateDisplay}</h1>
+        <h1 className="page-title text-ae-text">{dateDisplay}</h1>
         <p className="text-ae-text-muted text-sm">
           ¿Qué vas a lograr hoy{userName ? `, ${userName}` : ''}?
         </p>
