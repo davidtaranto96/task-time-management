@@ -9,7 +9,7 @@ import { TimerModeSelector } from '@/components/enfoque/TimerModeSelector'
 import { TaskSelector } from '@/components/enfoque/TaskSelector'
 import { SubtaskChecklist } from '@/components/enfoque/SubtaskChecklist'
 import type { TimerMode } from '@/types/timer'
-import { hapticSuccess, hapticMedium, hapticHeavy } from '@/lib/haptics'
+import { hapticSuccess, hapticMedium, hapticHeavy, hapticLight } from '@/lib/haptics'
 
 function playCompletionSound() {
   const AudioCtx = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
@@ -83,11 +83,13 @@ export default function EnfoquePage() {
   )
 
   const handleStart = () => {
+    hapticMedium()
     setCompletedMessage(false)
     startTimer(selectedTaskId, timer.mode)
   }
 
   const handleStop = () => {
+    hapticLight()
     if (selectedTaskId && isActive) {
       setShowTaskDoneDialog(true)
     } else {
@@ -147,18 +149,21 @@ export default function EnfoquePage() {
   const isActive = running || paused
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-8">
+    <div className="mx-auto max-w-lg px-4 py-6">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        {timer.isBreak ? (
-          <h1 className="text-sm font-medium text-green-400">🌿 Descanso</h1>
-        ) : (
-          <h1 className="text-sm font-medium text-ae-text-muted">🎯 Enfoque</h1>
-        )}
+      <header className="mb-6 flex items-start justify-between">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl font-bold text-ae-text">
+            {timer.isBreak ? '🌿 Descanso' : '🎯 Enfoque'}
+          </h1>
+          <p className="text-sm text-ae-text-muted">
+            {timer.isBreak ? 'Tomá un respiro' : 'Mantené el foco'}
+          </p>
+        </div>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-ae-surface-2 px-3 py-1 text-sm font-medium text-amber-400">
           <span className="text-base">🍅</span> {timer.sessionsCompleted}
         </span>
-      </div>
+      </header>
 
       {/* No task selected empty state — soft message, no redirect block */}
       {!selectedTaskId && isLoaded && (

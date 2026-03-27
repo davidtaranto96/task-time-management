@@ -8,6 +8,7 @@ import { canPromoteToPrimordial } from '@/lib/taskRules'
 import { runMigrations } from '@/lib/migration'
 import { getTodayId } from '@/lib/dateUtils'
 import type { TaskPriority } from '@/types/task'
+import { hapticSuccess, hapticLight } from '@/lib/haptics'
 
 import DayProgress from '@/components/hoy/DayProgress'
 import PriorityCard from '@/components/hoy/PriorityCard'
@@ -226,7 +227,7 @@ export default function HoyPage() {
                 key={task.id}
                 task={task}
                 index={i}
-                onComplete={() => completeTask(task.id)}
+                onComplete={() => { hapticSuccess(); completeTask(task.id) }}
                 onDefer={() => handleDefer(task.id)}
                 onDelete={() => deleteTask(task.id)}
                 className={deferringId === task.id ? 'opacity-0 translate-x-4 transition-all duration-300' : 'transition-all duration-300'}
@@ -259,7 +260,7 @@ export default function HoyPage() {
 
       {/* 4. Hábitos del día */}
       {activeHabits.length > 0 && (
-        <section className="space-y-3">
+        <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-ae-text flex items-center gap-2">
               Hábitos
@@ -271,13 +272,15 @@ export default function HoyPage() {
               Ver todos →
             </Link>
           </div>
-          <HabitRow
-            habits={activeHabits}
-            todayId={currentTodayId}
-            isCompleted={isCompletedToday}
-            onToggle={(habitId) => toggleCompletion(habitId, currentTodayId)}
-            getStreak={getStreak}
-          />
+          <div className="pt-1">
+            <HabitRow
+              habits={activeHabits}
+              todayId={currentTodayId}
+              isCompleted={isCompletedToday}
+              onToggle={(habitId) => { hapticLight(); toggleCompletion(habitId, currentTodayId) }}
+              getStreak={getStreak}
+            />
+          </div>
         </section>
       )}
 

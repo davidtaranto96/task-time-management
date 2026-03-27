@@ -37,6 +37,8 @@ export default function SecondaryTaskItem({ task, onComplete, onDefer, onPromote
             ? 'bg-amber-400'
             : task.priority === 'importante'
             ? 'bg-blue-400'
+            : task.priority === 'secundaria'
+            ? 'bg-purple-400'
             : 'bg-ae-text-muted'
         }`}
       />

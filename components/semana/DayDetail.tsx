@@ -18,12 +18,14 @@ const PRIORITY_OPTIONS: { value: TaskPriority; label: string; color: string; act
   { value: 'primordial', label: 'Primordial', color: 'text-ae-text-muted border-ae-border', activeColor: 'text-ae-primordial bg-ae-primordial/10 border-ae-primordial/50' },
   { value: 'importante', label: 'Importante', color: 'text-ae-text-muted border-ae-border', activeColor: 'text-ae-info bg-ae-info/10 border-ae-info/50' },
   { value: 'puede_esperar', label: 'Puede esperar', color: 'text-ae-text-muted border-ae-border', activeColor: 'text-ae-text-muted bg-ae-surface-2 border-ae-text-muted/30' },
+  { value: 'secundaria', label: 'Side quest', color: 'text-ae-text-muted border-ae-border', activeColor: 'text-purple-400 bg-purple-400/10 border-purple-400/50' },
 ]
 
 const PRIORITY_BADGES: Record<string, { label: string; color: string }> = {
   primordial: { label: 'Primordial', color: 'text-ae-primordial bg-ae-primordial/10 border-ae-primordial/30' },
   importante: { label: 'Importante', color: 'text-ae-info bg-ae-info/10 border-ae-info/30' },
   puede_esperar: { label: 'Puede esperar', color: 'text-ae-text-muted bg-ae-surface-2 border-ae-border' },
+  secundaria: { label: 'Side quest', color: 'text-purple-400 bg-purple-400/10 border-purple-400/30' },
 }
 
 export default function DayDetail({ dayId, tasks, onTasksChange }: DayDetailProps) {
@@ -32,6 +34,7 @@ export default function DayDetail({ dayId, tasks, onTasksChange }: DayDetailProp
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [priorityFilter, setPriorityFilter] = useState<'all' | TaskPriority>('all')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const date = new Date(dayId + 'T00:00:00')
@@ -39,6 +42,7 @@ export default function DayDetail({ dayId, tasks, onTasksChange }: DayDetailProp
   const dateStr = `${date.getDate()} ${MONTHS[date.getMonth()]}`
 
   const activeTasks = tasks.filter((t) => t.status !== 'deleted')
+  const filteredTasks = priorityFilter === 'all' ? activeTasks : activeTasks.filter(t => t.priority === priorityFilter)
 
   const handleAddTask = async () => {
     const title = newTaskTitle.trim()
@@ -121,12 +125,39 @@ export default function DayDetail({ dayId, tasks, onTasksChange }: DayDetailProp
         <span className="text-xs text-ae-text-muted">{dateStr}</span>
       </div>
 
+      {/* Priority filter pills */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide mb-3">
+        {(['all', 'primordial', 'importante', 'puede_esperar', 'secundaria'] as const).map((f) => {
+          const labels: Record<string, string> = {
+            all: 'Todo',
+            primordial: '🔴 Primordial',
+            importante: '🔵 Importante',
+            puede_esperar: '⚪ Puede esperar',
+            secundaria: '🟣 Side quest',
+          }
+          const isActive = priorityFilter === f
+          return (
+            <button
+              key={f}
+              onClick={() => setPriorityFilter(f)}
+              className={`flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
+                isActive
+                  ? 'bg-ae-primordial/15 text-ae-primordial border-ae-primordial/40'
+                  : 'bg-ae-surface border-ae-border text-ae-text-muted hover:text-ae-text'
+              }`}
+            >
+              {labels[f]}
+            </button>
+          )
+        })}
+      </div>
+
       <div className="bg-ae-surface rounded-xl border border-ae-border p-4">
-        {activeTasks.length === 0 ? (
+        {filteredTasks.length === 0 ? (
           <p className="text-center text-ae-text-muted text-sm py-4">Sin tareas para este día</p>
         ) : (
           <ul className="flex flex-col gap-2 mb-4">
-            {activeTasks.map((task) => {
+            {filteredTasks.map((task) => {
               const pInfo = PRIORITY_BADGES[task.priority] ?? PRIORITY_BADGES.puede_esperar
               const isDone = task.status === 'done'
               const isDeleting = deletingId === task.id

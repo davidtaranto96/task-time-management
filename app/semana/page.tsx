@@ -11,7 +11,9 @@ import WeekHeader from '@/components/semana/WeekHeader'
 import WeekGoals from '@/components/semana/WeekGoals'
 import WeekGrid from '@/components/semana/WeekGrid'
 import DayDetail from '@/components/semana/DayDetail'
+import ProjectDetail from '@/components/proyectos/ProjectDetail'
 import type { Task } from '@/types/task'
+import type { Project } from '@/types'
 
 function getWeekIdWithOffset(offset: number): string {
   const base = new Date()
@@ -38,11 +40,12 @@ function getWeekStartFromId(weekId: string): Date {
 export default function SemanaPage() {
   const { currentWeek, loadWeek, updateGoals } = useWeeklyStore()
   const { tasks: todayTasks, loadToday } = useTaskStore()
-  const { getActiveProjects, loadProjects } = useProjectStore()
+  const { getActiveProjects, loadProjects, updateProject, archiveProject, completeProject, addTaskToProject } = useProjectStore()
 
   const [weekOffset, setWeekOffset] = useState(0)
   const [weekTasks, setWeekTasks] = useState<Record<string, Task>>({})
   const [selectedDayId, setSelectedDayId] = useState<string>('')
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const todayId = getTodayId()
 
   const weekId = getWeekIdWithOffset(weekOffset)
@@ -189,7 +192,8 @@ export default function SemanaPage() {
                 return (
                   <div
                     key={project.id}
-                    className="bg-ae-surface border border-ae-border rounded-xl p-3 min-w-[140px] max-w-[180px]"
+                    onClick={() => setSelectedProject(project)}
+                    className="bg-ae-surface border border-ae-border rounded-xl p-3 min-w-[140px] max-w-[180px] cursor-pointer hover:border-ae-primordial/50 transition-colors"
                     style={{ borderLeftColor: project.color, borderLeftWidth: 3 }}
                   >
                     <div className="flex items-center gap-1.5 mb-1">
@@ -213,6 +217,43 @@ export default function SemanaPage() {
                   </div>
                 )
               })}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Project detail modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setSelectedProject(null)}>
+          <div className="w-full max-w-lg bg-ae-surface rounded-2xl border border-ae-border shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5">
+              <ProjectDetail
+                project={selectedProject}
+                tasks={Object.values(mergedTasks).filter(t => t.parentProjectId === selectedProject.id)}
+                onClose={() => setSelectedProject(null)}
+                onAddTask={async (title, priority) => {
+                  const { addTask } = useTaskStore.getState()
+                  const task = await addTask({ title, priority, parentProjectId: selectedProject.id })
+                  if (task) await addTaskToProject(selectedProject.id, task.id)
+                }}
+                onToggleTask={async (taskId) => {
+                  const { tasks: allTasks, updateTask } = useTaskStore.getState()
+                  const task = allTasks[taskId]
+                  if (!task) return
+                  await updateTask(taskId, { status: task.status === 'done' ? 'pending' : 'done' })
+                }}
+                onUpdateProject={async (updates) => {
+                  await updateProject(selectedProject.id, updates)
+                  setSelectedProject(prev => prev ? { ...prev, ...updates } : null)
+                }}
+                onArchive={async () => {
+                  await archiveProject(selectedProject.id)
+                  setSelectedProject(null)
+                }}
+                onComplete={async () => {
+                  await completeProject(selectedProject.id)
+                  setSelectedProject(null)
+                }}
+              />
             </div>
           </div>
         </div>

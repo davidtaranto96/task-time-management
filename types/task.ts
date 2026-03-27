@@ -1,6 +1,6 @@
 import type { AreaKey } from './area'
 
-export type TaskPriority = 'primordial' | 'importante' | 'puede_esperar'
+export type TaskPriority = 'primordial' | 'importante' | 'puede_esperar' | 'secundaria'
 export type TaskAction = 'do' | 'delegate' | 'defer' | 'delete'
 export type TaskStatus = 'pending' | 'in_progress' | 'done' | 'deferred' | 'delegated' | 'deleted'
 

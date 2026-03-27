@@ -22,15 +22,15 @@ export function recommendPriority(): TaskPriority {
 export function recommend4D(task: Task): TaskAction {
   if (task.status === 'done') return 'do'
   if (task.delegatedTo) return 'delegate'
-  if (task.priority === 'puede_esperar' && isOlderThanDays(task, 2)) return 'defer'
-  if (task.priority === 'puede_esperar') return 'defer'
+  if ((task.priority === 'puede_esperar' || task.priority === 'secundaria') && isOlderThanDays(task, 2)) return 'defer'
+  if (task.priority === 'puede_esperar' || task.priority === 'secundaria') return 'defer'
   return 'do'
 }
 
 // Check if a task should be suggested for elimination (older than 3 days, still pending, low priority)
 export function shouldSuggestElimination(task: Task): boolean {
   return (
-    task.priority === 'puede_esperar' &&
+    (task.priority === 'puede_esperar' || task.priority === 'secundaria') &&
     task.status === 'pending' &&
     isOlderThanDays(task, 3)
   )
