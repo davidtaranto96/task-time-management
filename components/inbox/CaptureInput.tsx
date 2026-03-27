@@ -46,12 +46,11 @@ export function CaptureInput({ onCapture }: CaptureInputProps) {
     onCapture(trimmed, selectedType)
     setValue("")
     setSelectedType("general")
-    setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto"
-        textareaRef.current.focus()
-      }
-    }, 0)
+    // Reset height only — no auto-refocus to avoid keyboard popup on mobile
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"
+      textareaRef.current.blur()
+    }
   }
 
   return (

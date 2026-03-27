@@ -28,7 +28,7 @@ function playCompletionSound() {
 
 export default function EnfoquePage() {
   const { tasks, loadToday, completeTask, isLoaded } = useTaskStore()
-  const { timer, startTimer, pauseTimer, resumeTimer, stopTimer, tickTimer, setMode, isRunning, isPaused } =
+  const { timer, startTimer, pauseTimer, resumeTimer, stopTimer, setMode, isRunning, isPaused } =
     useTimerStore()
   const { preferredTimerMode } = useSettingsStore()
 
@@ -207,7 +207,6 @@ export default function EnfoquePage() {
           status={timer.status}
           mode={timer.mode}
           isBreak={timer.isBreak}
-          onTick={tickTimer}
         />
       </div>
 

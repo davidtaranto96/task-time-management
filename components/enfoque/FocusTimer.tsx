@@ -10,7 +10,6 @@ interface FocusTimerProps {
   status: TimerStatus
   mode: TimerMode
   isBreak?: boolean
-  onTick: () => void
 }
 
 function getColors(mode: TimerMode, isBreak: boolean) {
@@ -26,15 +25,10 @@ const STATUS_LABEL: Record<TimerStatus, string> = {
   completed: '★ CLEAR!',
 }
 
-export function FocusTimer({ remainingSeconds, totalSeconds, status, mode, isBreak = false, onTick }: FocusTimerProps) {
+export function FocusTimer({ remainingSeconds, totalSeconds, status, mode, isBreak = false }: FocusTimerProps) {
   const [colonVisible, setColonVisible] = useState(true)
 
-  // Tick
-  useEffect(() => {
-    if (status !== 'running') return
-    const interval = setInterval(() => { onTick() }, 1000)
-    return () => clearInterval(interval)
-  }, [status, onTick])
+  // Tick is now handled globally by TimerProvider in layout — no local interval needed.
 
   // Blink colon while running
   useEffect(() => {

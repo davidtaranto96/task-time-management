@@ -28,7 +28,10 @@ export default function HabitRow({ habits, todayId, isCompleted, onToggle, getSt
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+    <div
+      className="grid gap-2"
+      style={{ gridTemplateColumns: `repeat(${Math.min(habits.length, 4)}, 1fr)` }}
+    >
       {habits.map((habit) => {
         const done = isCompleted(habit.id, todayId)
         const streak = getStreak(habit.id)
@@ -37,7 +40,7 @@ export default function HabitRow({ habits, todayId, isCompleted, onToggle, getSt
           <button
             key={habit.id}
             onClick={() => { hapticLight(); onToggle(habit.id) }}
-            className={`flex-shrink-0 flex flex-col items-center gap-1.5 rounded-2xl px-3 py-3 w-[90px] min-h-[88px] border-2 transition-all active:scale-95 ${
+            className={`flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 min-h-[88px] border-2 transition-all active:scale-95 ${
               done
                 ? 'bg-ae-success/10 border-ae-success'
                 : 'bg-ae-surface border-ae-border hover:border-ae-primordial/50'
@@ -48,8 +51,8 @@ export default function HabitRow({ habits, todayId, isCompleted, onToggle, getSt
               {habit.icon ?? habit.title.charAt(0).toUpperCase()}
             </span>
 
-            {/* Title */}
-            <span className={`text-xs text-center leading-tight w-full line-clamp-2 break-words ${
+            {/* Title — wraps naturally, no truncation */}
+            <span className={`text-xs text-center leading-tight w-full break-words hyphens-auto ${
               done ? 'text-ae-success' : 'text-ae-text-muted'
             }`}>
               {habit.title}
