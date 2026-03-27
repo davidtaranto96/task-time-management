@@ -9,6 +9,8 @@ import { runMigrations } from '@/lib/migration'
 import { getTodayId } from '@/lib/dateUtils'
 import type { TaskPriority } from '@/types/task'
 import { hapticSuccess, hapticLight } from '@/lib/haptics'
+import { getUserName } from '@/lib/userSettings'
+import { getDailyPhrase } from '@/lib/motivationalPhrases'
 
 import DayProgress from '@/components/hoy/DayProgress'
 import PriorityCard from '@/components/hoy/PriorityCard'
@@ -49,6 +51,13 @@ export default function HoyPage() {
   const [secondaryCollapsed, setSecondaryCollapsed] = useState(false)
   const [completedCollapsed, setCompletedCollapsed] = useState(true)
   const [fabPriority, setFabPriority] = useState<TaskPriority>('puede_esperar')
+  const [userName, setUserName] = useState<string | null>(null)
+  const [phrase, setPhrase] = useState<string>('')
+
+  useEffect(() => {
+    setUserName(getUserName())
+    setPhrase(getDailyPhrase())
+  }, [])
 
   // Run migrations once on first load
   useEffect(() => {
@@ -193,7 +202,12 @@ export default function HoyPage() {
       {/* 1. Header */}
       <header className="space-y-1">
         <h1 className="text-2xl font-bold text-ae-text">{dateDisplay}</h1>
-        <p className="text-ae-text-muted text-sm">¿Qué vas a lograr hoy?</p>
+        <p className="text-ae-text-muted text-sm">
+          ¿Qué vas a lograr hoy{userName ? `, ${userName}` : ''}?
+        </p>
+        {phrase && (
+          <p className="text-xs text-ae-text-muted/70 italic pt-0.5">{phrase}</p>
+        )}
       </header>
 
       {/* 2. Day Progress */}

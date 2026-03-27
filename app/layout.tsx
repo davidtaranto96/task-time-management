@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { BottomNav } from "@/components/shared/BottomNav"
+import OnboardingWrapper from "@/components/onboarding/OnboardingWrapper"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="bg-ae-bg text-ae-text min-h-screen antialiased">
-        <main className="pb-20"><div className="animate-fade-in">{children}</div></main>
-        <BottomNav />
+        <OnboardingWrapper>
+          <main className="pb-20"><div className="animate-fade-in">{children}</div></main>
+          <BottomNav />
+        </OnboardingWrapper>
       </body>
     </html>
   )
