@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Arquitectura Enfoque</string>
+    <string name="title_activity_main">Arquitectura Enfoque</string>
+    <string name="package_name">com.davidtaranto.enfoque</string>
+    <string name="custom_url_scheme">com.davidtaranto.enfoque</string>
+</resources>
