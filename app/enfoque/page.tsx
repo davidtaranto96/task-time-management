@@ -134,7 +134,7 @@ export default function EnfoquePage() {
   return (
     <div
       className="mx-auto max-w-lg px-4 py-3 flex flex-col gap-3 overflow-hidden"
-      style={{ height: 'calc(100dvh - 72px)' }}
+      style={{ height: 'calc(100dvh - 80px)' }}
     >
       {/* ── Header ── */}
       <header className="flex items-center justify-between flex-shrink-0">
