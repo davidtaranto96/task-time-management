@@ -78,7 +78,7 @@ export function CaptureInput({ onCapture }: CaptureInputProps) {
         onKeyDown={handleKeyDown}
         placeholder="Anotá lo que tengas en mente..."
         rows={3}
-        className="w-full resize-none rounded-xl bg-ae-surface-2 border border-ae-border p-4 text-ae-text placeholder:text-ae-text-muted focus:outline-none focus:ring-2 focus:ring-ae-primordial/60 transition-all"
+        className="w-full resize-none rounded-xl bg-ae-surface-2 border border-ae-border p-4 text-ae-text placeholder:text-ae-text-muted focus:outline-none focus:ring-2 focus:ring-ae-accent/40 transition-all font-mono text-sm"
         style={{ minHeight: "80px" }}
       />
       <div className="flex items-center justify-between">

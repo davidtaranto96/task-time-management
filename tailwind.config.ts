@@ -9,19 +9,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Premium dark theme tokens
-        "ae-bg": "#0a0a0b",
-        "ae-surface": "#111113",
-        "ae-surface-2": "#1a1a1f",
-        "ae-border": "#2a2a35",
+        // Claude Code dark theme tokens
+        "ae-bg": "#0d1117",
+        "ae-surface": "#161b22",
+        "ae-surface-2": "#1e2430",
+        "ae-border": "#30363d",
         "ae-primordial": "#f59e0b", // amber - high signal/primordial
         "ae-secondary": "#6b7280", // gray - noise/secondary
         "ae-info": "#3b82f6",      // blue - informational
-        "ae-success": "#10b981",   // emerald - success/done
-        "ae-danger": "#ef4444",    // red - delete/danger
-        "ae-accent": "#8b5cf6",    // violet - accent/CEO mode
-        "ae-text": "#f4f4f5",
-        "ae-text-muted": "#71717a",
+        "ae-success": "#34d399",   // emerald - success/done (Claude Code)
+        "ae-danger": "#f87171",    // red - delete/danger (Claude Code)
+        "ae-accent": "#c9a0ff",    // violet Claude - accent primary
+        "ae-link": "#7dd3fc",      // cyan - links/secondary actions
+        "ae-text": "#e6edf3",
+        "ae-text-muted": "#8b949e",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
